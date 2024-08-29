@@ -25,22 +25,13 @@ public class Member extends BaseTimeEntity {
     private String nickName;
     @Column(nullable = false)
     private String name;
-    private String eMail;
+    @Column
+    private String email;
 
     @OneToMany(mappedBy = "member")
     private List<Post> posts = new ArrayList<>();
 
     @OneToMany(mappedBy = "member")
     private List<Comment> comments = new ArrayList<>();
-
-    public static Member createUser(Member member, PasswordEncoder passwordEncoder) {
-        Member member1 = new Member();
-        member1.setMemberId(member.getMemberId());
-        member1.setPassword(passwordEncoder.encode(member.getPassword()));
-        member1.setEMail(member.getEMail());
-        member1.setName(member.getName());
-        member1.setNickName(member.getNickName());
-        return member1;
-    }
 
 }

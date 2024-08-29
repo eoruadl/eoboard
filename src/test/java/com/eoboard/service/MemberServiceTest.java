@@ -10,6 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -31,18 +33,17 @@ public class MemberServiceTest {
         Member member = new Member();
         member.setMemberId("test");
         member.setPassword("test1234");
-        member.setEMail("test@gmail.com");
+        member.setEmail(passwordEncoder.encode("test@gmail.com"));
         member.setName("홍길동");
         member.setNickName("신출귀몰");
+        member.setCreatedAt(LocalDateTime.now());
 
-        Member enMember = Member.createUser(member, passwordEncoder);
-
-        Long saveId = memberService.join(enMember);
+        Long saveId = memberService.join(member);
 
         em.flush();
 
         Member testMember = memberRepository.findOne(saveId);
-        assertEquals(enMember, testMember);
+        assertEquals(member, testMember);
     }
 
     @Test
