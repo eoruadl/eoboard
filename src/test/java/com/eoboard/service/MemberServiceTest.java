@@ -7,6 +7,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +29,8 @@ public class MemberServiceTest {
     MemberRepository memberRepository;
     @Autowired
     PasswordEncoder passwordEncoder;
+    @Autowired
+    AuthenticationManager authenticationManager;
     @Autowired
     EntityManager em;
 
@@ -73,6 +79,33 @@ public class MemberServiceTest {
             memberService.join(member2);
         });
 
+    }
+
+    @Test
+    public void 로그인() throws Exception {
+        Member member = new Member();
+        member.setMemberId("test");
+        member.setPassword(passwordEncoder.encode("1234"));
+        member.setName("test");
+        member.setNickName("nick");
+        member.setEmail("test@gmail.com");
+
+        memberService.join(member);
+
+        em.flush();
+
+        UsernamePasswordAuthenticationToken authenticationRequest =
+                UsernamePasswordAuthenticationToken.unauthenticated("test", "1234");
+
+        Authentication authentication = authenticationManager.authenticate(authenticationRequest);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAuth = auth.isAuthenticated();
+        String whoAmI = auth.getName();
+
+        Assertions.assertTrue(isAuth);
+        Assertions.assertEquals(member.getMemberId(), whoAmI);
     }
 
 
