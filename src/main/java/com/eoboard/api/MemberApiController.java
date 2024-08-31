@@ -2,15 +2,14 @@ package com.eoboard.api;
 
 import com.eoboard.domain.Member;
 import com.eoboard.service.MemberService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,21 +40,14 @@ public class MemberApiController {
         return new CreateMemberResponse(saveId);
     }
 
-    @PostMapping("api/v1/auth/login")
-    public ResponseEntity<String> loginMember(@RequestBody @Valid LoginMemberRequest request) {
-
-        try {
-            UsernamePasswordAuthenticationToken authenticationRequest =
-                    UsernamePasswordAuthenticationToken.unauthenticated(request.getMemberId(), request.getPassword());
-
-            Authentication authentication = authenticationManager.authenticate(authenticationRequest);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-
-
-        } catch (Exception e) {
-            throw e;
+    @PostMapping("/api/v1/auth/logout")
+    public ResponseEntity<String> logoutMember(HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        if (session != null) {
+            session.invalidate();
         }
-        String msg = "login success";
+
+        String msg = "logout success";
 
         return new ResponseEntity<>(msg, HttpStatus.OK);
     }

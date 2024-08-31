@@ -12,6 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -107,7 +108,5 @@ public class MemberServiceTest {
         Assertions.assertTrue(isAuth);
         Assertions.assertEquals(member.getMemberId(), whoAmI);
     }
-
-
 
 }
