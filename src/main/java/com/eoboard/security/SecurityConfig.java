@@ -1,5 +1,6 @@
 package com.eoboard.security;
 
+import com.eoboard.security.handler.JwtAuthenticationFailureHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -40,6 +41,7 @@ public class SecurityConfig {
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
         JwtAuthenticationFilter filter = new JwtAuthenticationFilter(authenticationManager(userDetailsService(), bCryptPasswordEncoder()));
+        filter.setAuthenticationFailureHandler(jwtAuthenticationFailureHandler());
         return filter;
     }
 
@@ -68,6 +70,11 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public JwtAuthenticationFailureHandler jwtAuthenticationFailureHandler() {
+        return new JwtAuthenticationFailureHandler();
     }
 
 

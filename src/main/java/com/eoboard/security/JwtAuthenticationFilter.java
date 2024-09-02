@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.util.Date;
 
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
-    private final long VALID_TIME = 1000L * 60 * 60;
     private String SECRET_KEY = "JWT1234!!";
 
     public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
@@ -38,7 +37,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         try {
             LoginRequest login = om.readValue(request.getInputStream(), LoginRequest.class);
-            System.out.println(login.toString());
             UsernamePasswordAuthenticationToken authRequest = UsernamePasswordAuthenticationToken
                     .unauthenticated(login.getMemberId(), login.getPassword());
             setDetails(request, authRequest);
