@@ -2,6 +2,7 @@ package com.eoboard.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.eoboard.security.handler.LoginResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -10,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -62,6 +64,15 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         response.addHeader("Authorization", "Bearer " + jwt);
 
+        LoginResponse res = new LoginResponse();
+        ObjectMapper om = new ObjectMapper();
+        res.setMemberId(principal.getUsername());
+        res.setMessage("로그인에 성공하였습니다.");
+        String jsonErrorResponse = om.writeValueAsString(res);
+        response.setCharacterEncoding("utf-8");
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.getWriter().write(jsonErrorResponse);
+
     }
     @Getter
     @AllArgsConstructor
@@ -78,5 +89,4 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                     '}';
         }
     }
-
 }

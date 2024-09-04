@@ -1,5 +1,6 @@
 package com.eoboard.security;
 
+import com.eoboard.security.handler.JwtAuthenticationEntryPoint;
 import com.eoboard.security.handler.JwtAuthenticationFailureHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,7 +35,9 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(jwtAuthorizationFilter(), BasicAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthorizationFilter(), BasicAuthenticationFilter.class)
+                .exceptionHandling(e -> e
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint()));
         return http.build();
     }
 
@@ -77,5 +80,9 @@ public class SecurityConfig {
         return new JwtAuthenticationFailureHandler();
     }
 
+    @Bean
+    public JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint() {
+        return new JwtAuthenticationEntryPoint();
+    }
 
 }
