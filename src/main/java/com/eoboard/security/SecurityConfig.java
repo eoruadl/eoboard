@@ -1,7 +1,9 @@
 package com.eoboard.security;
 
+import com.eoboard.repository.MemberRepository;
 import com.eoboard.security.handler.JwtAuthenticationEntryPoint;
 import com.eoboard.security.handler.JwtAuthenticationFailureHandler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,6 +22,9 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 @Configuration
 @EnableWebSecurity(debug = true)
 public class SecurityConfig {
+
+    @Autowired
+    private MemberRepository memberRepository;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -50,7 +55,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtAuthorizationFilter jwtAuthorizationFilter() {
-        JwtAuthorizationFilter filter = new JwtAuthorizationFilter(authenticationManager(userDetailsService(), bCryptPasswordEncoder()));
+        JwtAuthorizationFilter filter = new JwtAuthorizationFilter(authenticationManager(userDetailsService(), bCryptPasswordEncoder()), memberRepository);
         return filter;
     }
 
