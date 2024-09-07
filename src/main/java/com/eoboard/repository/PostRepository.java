@@ -25,4 +25,8 @@ public class PostRepository {
         return em.createQuery("select p from Post p", Post.class)
                 .getResultList();
     }
+
+    public void delete(Post post) {
+        em.remove(post);
+    }
 }

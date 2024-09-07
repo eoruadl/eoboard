@@ -4,6 +4,8 @@ import com.eoboard.domain.Member;
 import com.eoboard.domain.Post;
 import com.eoboard.repository.MemberRepository;
 import com.eoboard.repository.PostRepository;
+import com.eoboard.repository.post.query.PostQueryDto;
+import com.eoboard.repository.post.query.PostQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +20,8 @@ public class PostService {
 
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
+    private final PostQueryRepository postQueryRepository;
+
 
 
     /**
@@ -47,9 +51,19 @@ public class PostService {
     }
 
     /**
+     * 게시물 삭제
+     */
+    @Transactional
+    public void deletePost(Long post_id) {
+        Post findPost = postRepository.findOne(post_id);
+        postRepository.delete(findPost);
+    }
+
+    /**
      * 게시물 전체 조회
      */
     public List<Post> findAllPost() {
         return postRepository.findAll();
     }
+
 }
