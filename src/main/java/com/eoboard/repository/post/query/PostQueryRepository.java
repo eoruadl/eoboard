@@ -33,4 +33,16 @@ public class PostQueryRepository {
                 .setParameter("postId", postId)
                 .getSingleResult();
     }
+
+    public List<PostCommentQueryDto> findComments(Long postId) {
+        return em.createQuery(
+                        "select new com.eoboard.repository.post.query" +
+                                ".PostCommentQueryDto(c.id, m.nickName, c.content, c.createdAt, c.updatedAt)" +
+                                " from Comment c" +
+                                " join c.member m" +
+                                " join c.post p" +
+                                " where p.id = :postId", PostCommentQueryDto.class)
+                .setParameter("postId", postId)
+                .getResultList();
+    }
 }
