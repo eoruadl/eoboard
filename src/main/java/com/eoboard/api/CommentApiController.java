@@ -2,6 +2,7 @@ package com.eoboard.api;
 
 import com.eoboard.repository.CommentRepository;
 import com.eoboard.repository.post.query.PostCommentQueryDto;
+import com.eoboard.repository.post.query.PostQueryDto;
 import com.eoboard.repository.post.query.PostQueryRepository;
 import com.eoboard.service.CommentService;
 import com.eoboard.service.MemberService;
@@ -25,6 +26,11 @@ public class CommentApiController {
 
     @PostMapping("/api/v1/post/{postId}/comment")
     public CommentResponse createComment(@PathVariable("postId") Long postId, @RequestBody @Valid CommentRequest request, Principal principal) {
+        PostQueryDto post = postQueryRepository.findPost(postId);
+        if (post == null) {
+            throw new IllegalArgumentException("게시물이 존재하지 않습니다.");
+        }
+
         String memberId = principal.getName();
 
         Long commentId = commentService.comment(memberId, postId, request.content);
@@ -33,6 +39,11 @@ public class CommentApiController {
 
     @GetMapping("/api/v1/post/{postId}/comment")
     public List<PostCommentQueryDto> getComments(@PathVariable("postId") Long postId) {
+        PostQueryDto post = postQueryRepository.findPost(postId);
+        if (post == null) {
+            throw new IllegalArgumentException("게시물이 존재하지 않습니다.");
+        }
+
         return postQueryRepository.findComments(postId);
     }
 
@@ -40,7 +51,12 @@ public class CommentApiController {
     public CommentResponse updateComment(@PathVariable("postId") Long postId, @PathVariable("commentId") Long commentId
             , @RequestBody @Valid CommentRequest request, Principal principal) {
 
-        Long postMemberId = postQueryRepository.findPost(postId).getMemberId();
+        PostQueryDto post = postQueryRepository.findPost(postId);
+        if (post == null) {
+            throw new IllegalArgumentException("게시물이 존재하지 않습니다.");
+        }
+
+        Long postMemberId = post.getMemberId();
         Long memberId = memberService.findOneByMemberId(principal.getName()).getId();
         if (memberId != postMemberId) {
             throw new AccessDeniedException("권한이 없습니다.");
@@ -52,7 +68,12 @@ public class CommentApiController {
 
     @DeleteMapping("/api/v1/post/{postId}/comment/{commentId}")
     public CommentResponse deleteComment(@PathVariable("postId") Long postId, @PathVariable("commentId") Long commentId, Principal principal) {
-        Long postMemberId = postQueryRepository.findPost(postId).getMemberId();
+        PostQueryDto post = postQueryRepository.findPost(postId);
+        if (post == null) {
+            throw new IllegalArgumentException("게시물이 존재하지 않습니다.");
+        }
+
+        Long postMemberId = post.getMemberId();
         Long memberId = memberService.findOneByMemberId(principal.getName()).getId();
         if (memberId != postMemberId) {
             throw new AccessDeniedException("권한이 없습니다.");

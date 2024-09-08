@@ -1,6 +1,5 @@
 package com.eoboard.api;
 
-import com.eoboard.domain.Post;
 import com.eoboard.repository.post.query.PostQueryDto;
 import com.eoboard.repository.post.query.PostQueryRepository;
 import com.eoboard.service.MemberService;
@@ -8,8 +7,9 @@ import com.eoboard.service.PostService;
 import jakarta.validation.Valid;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -42,7 +42,11 @@ public class PostApiController {
 
     @GetMapping("/api/v1/post/{postId}")
     public PostQueryDto getPost(@PathVariable("postId") Long postId) {
-        return postQueryRepository.findPost(postId);
+        PostQueryDto post = postQueryRepository.findPost(postId);
+        if (post == null) {
+            throw new IllegalArgumentException("게시물이 존재하지 않습니다.");
+        }
+        return post;
     }
 
     @PutMapping("/api/v1/post/{postId}")
@@ -50,7 +54,12 @@ public class PostApiController {
             @PathVariable("postId") Long postId,
             @RequestBody @Valid PostRequest request, Principal principal) {
         Long memberId = memberService.findOneByMemberId(principal.getName()).getId();
-        Long postMemberId = postQueryRepository.findPost(postId).getMemberId();
+        PostQueryDto post = postQueryRepository.findPost(postId);
+        if (post == null) {
+            throw new IllegalArgumentException("게시물이 존재하지 않습니다.");
+        }
+
+        Long postMemberId = post.getMemberId();
         if (memberId != postMemberId) {
             throw new AccessDeniedException("권한이 없습니다.");
         }
@@ -62,7 +71,12 @@ public class PostApiController {
     @DeleteMapping("/api/v1/post/{postId}")
     public PostResponse deletePost(@PathVariable("postId") Long postId, Principal principal) {
         Long memberId = memberService.findOneByMemberId(principal.getName()).getId();
-        Long postMemberId = postQueryRepository.findPost(postId).getMemberId();
+        PostQueryDto post = postQueryRepository.findPost(postId);
+        if (post == null) {
+            throw new IllegalArgumentException("게시물이 존재하지 않습니다.");
+        }
+
+        Long postMemberId = post.getMemberId();
         if (memberId != postMemberId) {
             throw new AccessDeniedException("권한이 없습니다.");
         }
