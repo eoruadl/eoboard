@@ -1,6 +1,7 @@
 package com.eoboard.security;
 
 import com.eoboard.repository.MemberRepository;
+import com.eoboard.security.handler.JwtAccessDeniedHandler;
 import com.eoboard.security.handler.JwtAuthenticationEntryPoint;
 import com.eoboard.security.handler.JwtAuthenticationFailureHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,8 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthorizationFilter(), BasicAuthenticationFilter.class)
                 .exceptionHandling(e -> e
-                        .authenticationEntryPoint(jwtAuthenticationEntryPoint()));
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint())
+                        .accessDeniedHandler(jwtAccessDeniedHandler()));
         return http.build();
     }
 
@@ -83,6 +85,11 @@ public class SecurityConfig {
     @Bean
     public JwtAuthenticationFailureHandler jwtAuthenticationFailureHandler() {
         return new JwtAuthenticationFailureHandler();
+    }
+
+    @Bean
+    public JwtAccessDeniedHandler jwtAccessDeniedHandler() {
+        return new JwtAccessDeniedHandler();
     }
 
     @Bean

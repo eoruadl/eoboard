@@ -8,6 +8,7 @@ import com.eoboard.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -41,6 +42,9 @@ public class CommentApiController {
 
         Long postMemberId = postQueryRepository.findPost(postId).getMemberId();
         Long memberId = memberService.findOneByMemberId(principal.getName()).getId();
+        if (memberId != postMemberId) {
+            throw new AccessDeniedException("권한이 없습니다.");
+        }
 
         commentService.updateComment(commentId, request.content);
         return new CommentResponse(commentId);
@@ -50,6 +54,9 @@ public class CommentApiController {
     public CommentResponse deleteComment(@PathVariable("postId") Long postId, @PathVariable("commentId") Long commentId, Principal principal) {
         Long postMemberId = postQueryRepository.findPost(postId).getMemberId();
         Long memberId = memberService.findOneByMemberId(principal.getName()).getId();
+        if (memberId != postMemberId) {
+            throw new AccessDeniedException("권한이 없습니다.");
+        }
 
         commentService.deleteComment(commentId);
         return new CommentResponse(commentId);

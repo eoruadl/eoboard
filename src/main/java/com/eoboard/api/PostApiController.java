@@ -8,6 +8,8 @@ import com.eoboard.service.PostService;
 import jakarta.validation.Valid;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -49,6 +51,9 @@ public class PostApiController {
             @RequestBody @Valid PostRequest request, Principal principal) {
         Long memberId = memberService.findOneByMemberId(principal.getName()).getId();
         Long postMemberId = postQueryRepository.findPost(postId).getMemberId();
+        if (memberId != postMemberId) {
+            throw new AccessDeniedException("권한이 없습니다.");
+        }
 
         postService.updatePost(postId, request.topic, request.title, request.content);
         return new PostResponse(postId);
@@ -58,6 +63,9 @@ public class PostApiController {
     public PostResponse deletePost(@PathVariable("postId") Long postId, Principal principal) {
         Long memberId = memberService.findOneByMemberId(principal.getName()).getId();
         Long postMemberId = postQueryRepository.findPost(postId).getMemberId();
+        if (memberId != postMemberId) {
+            throw new AccessDeniedException("권한이 없습니다.");
+        }
 
         postService.deletePost(postId);
         return new PostResponse(postId);
