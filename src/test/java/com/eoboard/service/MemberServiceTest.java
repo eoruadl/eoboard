@@ -1,112 +1,95 @@
 package com.eoboard.service;
 
-import com.eoboard.domain.Member;
-import com.eoboard.repository.MemberRepository;
-import jakarta.persistence.EntityManager;
-import org.junit.jupiter.api.Assertions;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @Transactional
+@AutoConfigureMockMvc
 public class MemberServiceTest {
 
     @Autowired
-    MemberService memberService;
+    MockMvc mockMvc;
     @Autowired
-    MemberRepository memberRepository;
-    @Autowired
-    PasswordEncoder passwordEncoder;
-    @Autowired
-    AuthenticationManager authenticationManager;
-    @Autowired
-    EntityManager em;
+    ObjectMapper om;
 
-    @Test
+    @BeforeEach
     public void 회원가입() throws Exception {
-        Member member = new Member();
-        member.setMemberId("test");
-        member.setPassword("test1234");
-        member.setEmail(passwordEncoder.encode("test@gmail.com"));
-        member.setName("홍길동");
-        member.setNickName("신출귀몰");
-        member.setCreatedAt(LocalDateTime.now());
+        Map<String, String> body = new HashMap<>();
+        body.put("memberId", "eoruadl");
+        body.put("password", "1234");
+        body.put("nickName", "nick");
+        body.put("name", "name");
+        body.put("email", "test@gmail.com");
 
-        Long saveId = memberService.join(member);
+        mockMvc.perform(post("/api/v1/auth/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(body)))
+                .andExpect(status().isOk());
 
-        em.flush();
-
-        Member testMember = memberRepository.findOne(saveId);
-        assertEquals(member, testMember);
     }
 
     @Test
     public void 회원가입_중복_예외() throws Exception {
-        Member member1 = new Member();
-        Member member2 = new Member();
 
-        member1.setMemberId("id");
-        member1.setPassword("1234");
-        member1.setName("test");
-        member1.setNickName("nick");
+        // ID 중복
+        Map<String, String> body = new HashMap<>();
+        body.put("memberId", "eoruadl");
+        body.put("password", "1234");
+        body.put("nickName", "nick1");
+        body.put("name", "name");
+        body.put("email", "test@gmail.com");
 
-        member2.setMemberId("id");
-        member2.setPassword("1234");
-        member2.setName("test");
-        member2.setNickName("nick");
+        mockMvc.perform(post("/api/v1/auth/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(body)))
+                .andExpect(status().is4xxClientError());
 
-        //중복 ID 예외
-        memberService.join(member1);
-        assertThrows(IllegalStateException.class, () -> {
-            memberService.join(member2);
-        });
+        // 닉네임 중복
+        body.put("memberId", "eorua");
+        body.put("nickName", "nick");
 
-        //중복 닉네임 예외
-        member2.setMemberId("test2");
-        assertThrows(IllegalStateException.class, () -> {
-            memberService.join(member2);
-        });
-
+        mockMvc.perform(post("/api/v1/auth/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(body)))
+                .andExpect(status().is4xxClientError());
     }
 
     @Test
-    public void 로그인() throws Exception {
-        Member member = new Member();
-        member.setMemberId("test");
-        member.setPassword(passwordEncoder.encode("1234"));
-        member.setName("test");
-        member.setNickName("nick");
-        member.setEmail("test@gmail.com");
+    public void 로그인_성공() throws Exception {
 
-        memberService.join(member);
+        Map<String, String> body = new HashMap<>();
+        body.put("memberId", "eoruadl");
+        body.put("password", "1234");
 
-        em.flush();
-
-        UsernamePasswordAuthenticationToken authenticationRequest =
-                UsernamePasswordAuthenticationToken.unauthenticated("test", "1234");
-
-        Authentication authentication = authenticationManager.authenticate(authenticationRequest);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        boolean isAuth = auth.isAuthenticated();
-        String whoAmI = auth.getName();
-
-        Assertions.assertTrue(isAuth);
-        Assertions.assertEquals(member.getMemberId(), whoAmI);
+        mockMvc.perform(post("/api/v1/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(body)))
+                .andExpect(status().isOk());
     }
 
+    @Test
+    public void 로그인_실패() throws Exception {
+        Map<String, String> body = new HashMap<>();
+        body.put("memberId", "eoruadl");
+        body.put("password", "1235");
+
+        mockMvc.perform(post("/api/v1/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(body)))
+                .andExpect(status().is4xxClientError());
+    }
 }
