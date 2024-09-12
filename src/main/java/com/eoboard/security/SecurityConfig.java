@@ -1,9 +1,7 @@
 package com.eoboard.security;
 
 import com.eoboard.repository.MemberRepository;
-import com.eoboard.security.handler.JwtAccessDeniedHandler;
-import com.eoboard.security.handler.JwtAuthenticationEntryPoint;
-import com.eoboard.security.handler.JwtAuthenticationFailureHandler;
+import com.eoboard.security.handler.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,6 +38,11 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .anyRequest().authenticated()
                 )
+                .logout((logout) -> logout.logoutUrl("/api/v1/auth/logout")
+                        .addLogoutHandler(customLogoutHandler())
+                        .logoutSuccessHandler(customLogoutSuccessHandler())
+                        .deleteCookies("JSESSIONID", "remember-me")
+                        .invalidateHttpSession(true))
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthorizationFilter(), BasicAuthenticationFilter.class)
                 .exceptionHandling(e -> e
@@ -95,6 +98,15 @@ public class SecurityConfig {
     @Bean
     public JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint() {
         return new JwtAuthenticationEntryPoint();
+    }
+
+    @Bean
+    public CustomLogoutHandler customLogoutHandler() {
+        return new CustomLogoutHandler();
+    }
+    @Bean
+    public CustomLogoutSuccessHandler customLogoutSuccessHandler() {
+        return new CustomLogoutSuccessHandler();
     }
 
 }

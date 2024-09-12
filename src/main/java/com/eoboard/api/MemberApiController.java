@@ -38,18 +38,6 @@ public class MemberApiController {
         return new CreateMemberResponse(saveId);
     }
 
-    @PostMapping("/api/v1/auth/logout")
-    public ResponseEntity<String> logoutMember(HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        if (session != null) {
-            session.invalidate();
-        }
-
-        String msg = "logout success";
-
-        return new ResponseEntity<>(msg, HttpStatus.OK);
-    }
-
     @Data
     static class CreateMemberRequest {
         private String memberId;
