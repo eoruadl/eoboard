@@ -2,7 +2,9 @@ package com.eoboard.service;
 
 import com.eoboard.domain.Comment;
 import com.eoboard.domain.Member;
+import com.eoboard.dto.comment.PostCommentDto;
 import com.eoboard.repository.CommentRepository;
+import com.eoboard.repository.PostRepository;
 import com.eoboard.repository.post.query.PostCommentQueryDto;
 import com.eoboard.repository.post.query.PostQueryRepository;
 import jakarta.persistence.EntityManager;
@@ -30,7 +32,7 @@ public class CommentServiceTest {
     @Autowired
     CommentRepository commentRepository;
     @Autowired
-    PostQueryRepository postQueryRepository;
+    PostRepository postRepository;
     @Autowired
     EntityManager em;
     @Autowired
@@ -44,7 +46,7 @@ public class CommentServiceTest {
         Long commentId = commentService.comment(member.getMemberId(), postId, "댓글을 작성합니다.");
 
         //when
-        List<PostCommentQueryDto> comments = postQueryRepository.findComments(postId);
+        List<PostCommentDto> comments = postRepository.findPostComments(postId);
 
         //then
         assertEquals(commentId, comments.get(0).getCommentId());
@@ -61,7 +63,7 @@ public class CommentServiceTest {
 
         //when
         commentService.updateComment(commentId, "댓글을 수정합니다.");
-        List<PostCommentQueryDto> comments = postQueryRepository.findComments(postId);
+        List<PostCommentDto> comments = postRepository.findPostComments(postId);
 
         //then
         assertEquals(commentId, comments.get(0).getCommentId());

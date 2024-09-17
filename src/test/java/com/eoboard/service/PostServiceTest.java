@@ -2,6 +2,8 @@ package com.eoboard.service;
 
 import com.eoboard.domain.Member;
 import com.eoboard.domain.Post;
+import com.eoboard.dto.post.PostDto;
+import com.eoboard.dto.post.PostPageDto;
 import com.eoboard.repository.PostRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
@@ -10,6 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
@@ -17,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -93,6 +98,26 @@ public class PostServiceTest {
     }
 
     @Test
+    public void 게시물_페이지_조회() throws Exception {
+        //given
+        Member member = createMember();
+        postService.post(member.getId(), "test1", "게시물1", "게시물 작성합니다.");
+        postService.post(member.getId(), "test2", "게시물2", "게시물 작성합니다.");
+        postService.post(member.getId(), "test3", "게시물3", "게시물 작성합니다.");
+        postService.post(member.getId(), "test4", "게시물4", "게시물 작성합니다.");
+        postService.post(member.getId(), "test5", "게시물5", "게시물 작성합니다.");
+
+        PageRequest pageRequest = PageRequest.of(0, 3);
+
+        //when
+        Page<PostPageDto> result = postRepository.findPagePost(pageRequest);
+
+        //then
+        assertThat(result.getSize()).isEqualTo(3);
+        assertThat(result.getContent()).extracting("title").containsExactly("게시물1", "게시물2", "게시물3");
+    }
+
+    @Test
     public void 게시물_조회() throws Exception {
         //given
         Member member = createMember();
@@ -105,6 +130,24 @@ public class PostServiceTest {
         assertEquals("test1", findPost.getTopic());
         assertEquals("게시물1", findPost.getTitle());
         assertEquals("게시물 작성합니다.", findPost.getContent());
+    }
+
+    @Test
+    public void Q_게시물_단건_조회() throws Exception {
+        //given
+        Member member = createMember();
+        Long postId = postService.post(member.getId(), "test1", "게시물1", "게시물 작성합니다.");
+
+        //when
+        PostDto findPost = postRepository.findPost(postId);
+
+        System.out.println(findPost);
+
+        //then
+        assertEquals("test1", findPost.getTopic());
+        assertEquals("게시물1", findPost.getTitle());
+        assertEquals("게시물 작성합니다.", findPost.getContent());
+        assertEquals("nick", findPost.getNickName());
     }
 
     @Test
@@ -133,7 +176,7 @@ public class PostServiceTest {
 
         //then
         Optional<Post> findPost = postRepository.findById(postId);
-        Assertions.assertThat(findPost).isEmpty();
+        assertThat(findPost).isEmpty();
     }
 
     private Member createMember() {

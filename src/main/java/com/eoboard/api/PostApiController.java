@@ -1,19 +1,19 @@
 package com.eoboard.api;
 
-import com.eoboard.repository.post.query.PostQueryDto;
-import com.eoboard.repository.post.query.PostQueryRepository;
+import com.eoboard.dto.post.PostDto;
+import com.eoboard.dto.post.PostPageDto;
+import com.eoboard.repository.PostRepository;
 import com.eoboard.service.MemberService;
 import com.eoboard.service.PostService;
 import jakarta.validation.Valid;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,7 +21,7 @@ public class PostApiController {
 
     private final MemberService memberService;
     private final PostService postService;
-    private final PostQueryRepository postQueryRepository;
+    private final PostRepository postRepository;
 
     @PostMapping("/api/v1/post")
     public PostResponse createPost(@RequestBody @Valid PostRequest request, Principal principal) {
@@ -34,15 +34,14 @@ public class PostApiController {
     }
 
     @GetMapping("/api/v1/post")
-    public List<PostQueryDto> getPosts(
-            @RequestParam(value = "offset", defaultValue = "0") int offset,
-            @RequestParam(value = "limit", defaultValue = "10") int limit) {
-        return postQueryRepository.findAllPost(offset, limit);
+    public Page<PostPageDto> getPosts(Pageable pageable) {
+        return postRepository.findPagePost(pageable);
     }
 
     @GetMapping("/api/v1/post/{postId}")
-    public PostQueryDto getPost(@PathVariable("postId") Long postId) {
-        PostQueryDto post = postQueryRepository.findPost(postId);
+    public PostDto getPost(@PathVariable("postId") Long postId) {
+        PostDto post = postRepository.findPost(postId);
+        System.out.println(post);
         if (post == null) {
             throw new IllegalArgumentException("게시물이 존재하지 않습니다.");
         }
@@ -54,7 +53,7 @@ public class PostApiController {
             @PathVariable("postId") Long postId,
             @RequestBody @Valid PostRequest request, Principal principal) {
         Long memberId = memberService.findOneByMemberId(principal.getName()).getId();
-        PostQueryDto post = postQueryRepository.findPost(postId);
+        PostDto post = postRepository.findPost(postId);
         if (post == null) {
             throw new IllegalArgumentException("게시물이 존재하지 않습니다.");
         }
@@ -71,7 +70,7 @@ public class PostApiController {
     @DeleteMapping("/api/v1/post/{postId}")
     public PostResponse deletePost(@PathVariable("postId") Long postId, Principal principal) {
         Long memberId = memberService.findOneByMemberId(principal.getName()).getId();
-        PostQueryDto post = postQueryRepository.findPost(postId);
+        PostDto post = postRepository.findPost(postId);
         if (post == null) {
             throw new IllegalArgumentException("게시물이 존재하지 않습니다.");
         }
