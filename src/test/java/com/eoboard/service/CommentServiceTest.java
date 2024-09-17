@@ -3,10 +3,10 @@ package com.eoboard.service;
 import com.eoboard.domain.Comment;
 import com.eoboard.domain.Member;
 import com.eoboard.repository.CommentRepository;
-import com.eoboard.repository.PostRepository;
 import com.eoboard.repository.post.query.PostCommentQueryDto;
 import com.eoboard.repository.post.query.PostQueryRepository;
 import jakarta.persistence.EntityManager;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,6 +14,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -76,10 +78,10 @@ public class CommentServiceTest {
 
         //when
         commentService.deleteComment(commentId);
-        Comment findComment = commentRepository.findOne(commentId);
+        Optional<Comment> findComment = commentRepository.findById(commentId);
 
         //then
-        assertEquals(null, findComment);
+        Assertions.assertThat(findComment).isEmpty();
     }
 
     private Member createMember() {

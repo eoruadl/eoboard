@@ -4,14 +4,13 @@ import com.eoboard.domain.Member;
 import com.eoboard.domain.Post;
 import com.eoboard.repository.MemberRepository;
 import com.eoboard.repository.PostRepository;
-import com.eoboard.repository.post.query.PostQueryDto;
-import com.eoboard.repository.post.query.PostQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 @Transactional(readOnly = true)
@@ -20,16 +19,13 @@ public class PostService {
 
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
-    private final PostQueryRepository postQueryRepository;
-
-
 
     /**
      * 게시물 작성
      */
     @Transactional
     public Long post(Long memberId, String topic, String title, String content) {
-        Member member = memberRepository.findOne(memberId);
+        Member member = memberRepository.findById(memberId).orElseThrow(NoSuchElementException::new);
 
         Post post = Post.createPost(member, topic, title, content);
 
@@ -42,8 +38,8 @@ public class PostService {
      * 게시물 수정
      */
     @Transactional
-    public void updatePost(Long post_id, String topic, String title, String content) {
-        Post findPost = postRepository.findOne(post_id);
+    public void updatePost(Long postId, String topic, String title, String content) {
+        Post findPost = postRepository.findById(postId).orElseThrow(NoSuchElementException::new);
         findPost.setTopic(topic);
         findPost.setTitle(title);
         findPost.setContent(content);
@@ -54,8 +50,8 @@ public class PostService {
      * 게시물 삭제
      */
     @Transactional
-    public void deletePost(Long post_id) {
-        Post findPost = postRepository.findOne(post_id);
+    public void deletePost(Long postId) {
+        Post findPost = postRepository.findById(postId).orElseThrow(NoSuchElementException::new);
         postRepository.delete(findPost);
     }
 

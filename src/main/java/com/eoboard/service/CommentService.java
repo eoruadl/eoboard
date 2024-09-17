@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.NoSuchElementException;
 
 @Service
 @Transactional(readOnly = true)
@@ -27,7 +28,7 @@ public class CommentService {
     @Transactional
     public Long comment(String memberId, Long postId, String content) {
         Member member = memberRepository.findByMemberId(memberId).get(0);
-        Post post = postRepository.findOne(postId);
+        Post post = postRepository.findById(postId).orElseThrow(NoSuchElementException::new);
 
         Comment comment = Comment.createComment(member, post, content);
 
@@ -41,7 +42,7 @@ public class CommentService {
      */
     @Transactional
     public void updateComment(Long commentId, String content) {
-        Comment comment = commentRepository.findOne(commentId);
+        Comment comment = commentRepository.findById(commentId).orElseThrow(NoSuchElementException::new);
         comment.setContent(content);
         comment.setUpdatedAt(LocalDateTime.now());
     }
@@ -51,7 +52,7 @@ public class CommentService {
      */
     @Transactional
     public void deleteComment(Long commentId) {
-        Comment comment = commentRepository.findOne(commentId);
+        Comment comment = commentRepository.findById(commentId).orElseThrow(NoSuchElementException::new);
         commentRepository.delete(comment);
     }
 }

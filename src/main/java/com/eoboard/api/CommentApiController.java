@@ -1,6 +1,5 @@
 package com.eoboard.api;
 
-import com.eoboard.repository.CommentRepository;
 import com.eoboard.repository.post.query.PostCommentQueryDto;
 import com.eoboard.repository.post.query.PostQueryDto;
 import com.eoboard.repository.post.query.PostQueryRepository;

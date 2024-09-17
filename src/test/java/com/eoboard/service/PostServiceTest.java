@@ -5,6 +5,7 @@ import com.eoboard.domain.Post;
 import com.eoboard.repository.PostRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -14,9 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -69,7 +68,7 @@ public class PostServiceTest {
         Long postId = postService.post(member.getId(), topic, title, content);
 
         //then
-        Post getPost = postRepository.findOne(postId);
+        Post getPost = postRepository.findById(postId).orElseThrow(NoSuchElementException::new);
 
         assertEquals("test", getPost.getTopic());
         assertEquals("게시물", getPost.getTitle());
@@ -100,7 +99,7 @@ public class PostServiceTest {
         Long postId = postService.post(member.getId(), "test1", "게시물1", "게시물 작성합니다.");
 
         //when
-        Post findPost = postRepository.findOne(postId);
+        Post findPost = postRepository.findById(postId).orElseThrow(NoSuchElementException::new);
 
         //then
         assertEquals("test1", findPost.getTopic());
@@ -118,7 +117,7 @@ public class PostServiceTest {
         postService.updatePost(postId, "test1", "게시물수정", "게시물 수정합니다.");
 
         //then
-        Post findPost = postRepository.findOne(postId);
+        Post findPost = postRepository.findById(postId).orElseThrow(NoSuchElementException::new);
         assertEquals("게시물수정", findPost.getTitle());
         assertEquals("게시물 수정합니다.", findPost.getContent());
     }
@@ -133,8 +132,8 @@ public class PostServiceTest {
         postService.deletePost(postId);
 
         //then
-        Post findPost = postRepository.findOne(postId);
-        assertEquals(null, findPost);
+        Optional<Post> findPost = postRepository.findById(postId);
+        Assertions.assertThat(findPost).isEmpty();
     }
 
     private Member createMember() {
