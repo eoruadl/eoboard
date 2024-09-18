@@ -53,7 +53,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             .getClaim("memberId")
             .asString();
 
-            Member member = memberRepository.findByMemberId(memberId).get(0);
+            Member member = memberRepository.findByMemberId(memberId).get();
 
             CustomUserDetails userDetails = new CustomUserDetails(member);
 

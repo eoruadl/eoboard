@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDateTime;
-
 @RestController
 @RequiredArgsConstructor
 public class MemberApiController {
@@ -28,7 +26,7 @@ public class MemberApiController {
         member.setName(request.getName());
         member.setNickName(request.getNickName());
         member.setEmail(request.getEmail());
-        member.setCreatedAt(LocalDateTime.now());
+        member.updateCreatedAt();
 
         Long saveId = memberService.join(member);
         return new CreateMemberResponse(saveId);

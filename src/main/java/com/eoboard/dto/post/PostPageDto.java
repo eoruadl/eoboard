@@ -1,6 +1,5 @@
 package com.eoboard.dto.post;
 
-import com.eoboard.repository.post.query.PostCommentQueryDto;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Data;
 

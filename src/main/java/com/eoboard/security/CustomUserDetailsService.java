@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.List;
+import java.util.Optional;
 
 public class CustomUserDetailsService implements UserDetailsService {
     @Autowired
@@ -15,12 +16,12 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String memberId) throws UsernameNotFoundException {
-        List<Member> findMembers = memberRepository.findByMemberId(memberId);
+        Optional<Member> findMembers = memberRepository.findByMemberId(memberId);
         if (findMembers.isEmpty()) {
             throw new UsernameNotFoundException("아이디를 찾을 수 없습니다.");
         }
 
-        Member member = findMembers.get(0);
+        Member member = findMembers.get();
 
         return new CustomUserDetails(member);
     }

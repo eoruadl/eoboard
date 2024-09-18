@@ -72,15 +72,20 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
     @Override
     public List<PostCommentDto> findPostComments(Long postId) {
         return queryFactory
-                .select(new QPostCommentDto(
-                        comment.id.as("comment_id"),
+                .select(new QPostCommentDto(comment.id.as("comment_id"),
                         member.nickName,
                         comment.content,
+                        comment.parent.id.as("parent_id"),
+                        comment.isDeleted,
                         comment.createdAt,
                         comment.updatedAt))
                 .from(comment)
-                .leftJoin(comment.post, post)
                 .leftJoin(comment.member, member)
+                .where(comment.post.id.eq(postId))
+                .orderBy(
+                        comment.parent.id.asc().nullsFirst(),
+                        comment.createdAt.asc()
+                )
                 .fetch();
     }
 }

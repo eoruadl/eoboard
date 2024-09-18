@@ -5,8 +5,6 @@ import com.eoboard.domain.Member;
 import com.eoboard.dto.comment.PostCommentDto;
 import com.eoboard.repository.CommentRepository;
 import com.eoboard.repository.PostRepository;
-import com.eoboard.repository.post.query.PostCommentQueryDto;
-import com.eoboard.repository.post.query.PostQueryRepository;
 import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -16,7 +14,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -40,18 +37,35 @@ public class CommentServiceTest {
 
     @Test
     public void 댓글_작성() throws Exception {
-        //given
+        // 댓글 작성
         Member member = createMember();
         Long postId = postService.post(member.getId(), "test1", "게시물1", "게시물 작성합니다.");
-        Long commentId = commentService.comment(member.getMemberId(), postId, "댓글을 작성합니다.");
+        Long commentId = commentService.createComment(member.getMemberId(), postId, "댓글을 작성합니다.", null);
 
-        //when
         List<PostCommentDto> comments = postRepository.findPostComments(postId);
 
-        //then
         assertEquals(commentId, comments.get(0).getCommentId());
         assertEquals("nick", comments.get(0).getNickName());
         assertEquals("댓글을 작성합니다.", comments.get(0).getContent());
+
+        // 대댓글 작성
+        Member member2 = new Member();
+        member2.setMemberId("eorua");
+        member2.setPassword(bCryptPasswordEncoder.encode("1234"));
+        member2.setNickName("nick1");
+        member2.setName("name1");
+        member2.setEmail("test1@gmail.com");
+        em.persist(member2);
+
+        Long commentId2 = commentService.createComment(member2.getMemberId(), postId, "대댓글을 작성합니다.", commentId);
+
+        Comment comment = commentRepository.findById(commentId2).get();
+
+        assertEquals(commentId2, comment.getId());
+        assertEquals("nick1", comment.getMember().getNickName());
+        assertEquals("대댓글을 작성합니다.", comment.getContent());
+        assertEquals(commentId, comment.getParent().getId());
+
     }
 
     @Test

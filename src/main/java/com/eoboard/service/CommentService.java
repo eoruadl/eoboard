@@ -3,6 +3,7 @@ package com.eoboard.service;
 import com.eoboard.domain.Comment;
 import com.eoboard.domain.Member;
 import com.eoboard.domain.Post;
+import com.eoboard.dto.comment.PostCommentDto;
 import com.eoboard.repository.CommentRepository;
 import com.eoboard.repository.MemberRepository;
 import com.eoboard.repository.PostRepository;
@@ -11,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -27,13 +30,33 @@ public class CommentService {
      */
     @Transactional
     public Long comment(String memberId, Long postId, String content) {
-        Member member = memberRepository.findByMemberId(memberId).get(0);
+        Member member = memberRepository.findByMemberId(memberId).get();
         Post post = postRepository.findById(postId).orElseThrow(NoSuchElementException::new);
 
         Comment comment = Comment.createComment(member, post, content);
 
         commentRepository.save(comment);
 
+        return comment.getId();
+    }
+
+    @Transactional
+    public Long createComment(String memberId, Long postId, String content, Long parentId) {
+        Member findMember = memberRepository.findByMemberId(memberId).orElseThrow(NoSuchElementException::new);
+        Post findPost = postRepository.findById(postId).orElseThrow(NoSuchElementException::new);
+
+        Comment comment = new Comment(content);
+        Comment parentComment;
+        if (parentId != null) {
+            parentComment = commentRepository.findById(parentId).orElseThrow(NoSuchElementException::new);
+            comment.updateParent(parentComment);
+        }
+        comment.updateMember(findMember);
+        comment.updatePost(findPost);
+        comment.updateCreatedAt();
+        comment.updateIsDeleted(false);
+
+        commentRepository.save(comment);
         return comment.getId();
     }
 
@@ -44,7 +67,7 @@ public class CommentService {
     public void updateComment(Long commentId, String content) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(NoSuchElementException::new);
         comment.setContent(content);
-        comment.setUpdatedAt(LocalDateTime.now());
+        comment.updateCreatedAt();
     }
 
     /**

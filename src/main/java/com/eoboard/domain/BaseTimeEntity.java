@@ -7,11 +7,15 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @MappedSuperclass
-@Getter @Setter
+@Getter
 public abstract class BaseTimeEntity {
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime deletedAt;
+
+    public void updateCreatedAt() {
+        this.createdAt = LocalDateTime.now();
+    }
 
 }

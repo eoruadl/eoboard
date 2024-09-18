@@ -33,7 +33,7 @@ public class Post extends BaseTimeEntity {
         post.setTopic(topic);
         post.setTitle(title);
         post.setContent(content);
-        post.setCreatedAt(LocalDateTime.now());
+        post.updateCreatedAt();
         return post;
     }
 }

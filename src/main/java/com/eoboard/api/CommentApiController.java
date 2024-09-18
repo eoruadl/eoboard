@@ -2,6 +2,7 @@ package com.eoboard.api;
 
 import com.eoboard.dto.comment.PostCommentDto;
 import com.eoboard.dto.post.PostDto;
+import com.eoboard.repository.CommentRepository;
 import com.eoboard.repository.PostRepository;
 import com.eoboard.service.CommentService;
 import com.eoboard.service.MemberService;
@@ -21,10 +22,11 @@ public class CommentApiController {
     private final MemberService memberService;
     private final CommentService commentService;
     private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
 
 
     @PostMapping("/api/v1/post/{postId}/comment")
-    public CommentResponse createComment(@PathVariable("postId") Long postId, @RequestBody @Valid CommentRequest request, Principal principal) {
+    public CommentResponse createParentComment(@PathVariable("postId") Long postId, @RequestBody @Valid CommentRequest request, Principal principal) {
         PostDto post = postRepository.findPost(postId);
         if (post == null) {
             throw new IllegalArgumentException("게시물이 존재하지 않습니다.");
@@ -32,7 +34,21 @@ public class CommentApiController {
 
         String memberId = principal.getName();
 
-        Long commentId = commentService.comment(memberId, postId, request.content);
+        Long commentId = commentService.createComment(memberId, postId, request.content, null);
+        return new CommentResponse(commentId);
+    }
+
+    @PostMapping("/api/v1/post/{postId}/comment/{parentId}")
+    public CommentResponse createChildComment(@PathVariable("postId") Long postId, @PathVariable("parentId") Long parentId,
+                                         @RequestBody @Valid CommentRequest request, Principal principal) {
+        PostDto post = postRepository.findPost(postId);
+        if (post == null) {
+            throw new IllegalArgumentException("게시물이 존재하지 않습니다.");
+        }
+
+        String memberId = principal.getName();
+
+        Long commentId = commentService.createComment(memberId, postId, request.content, parentId);
         return new CommentResponse(commentId);
     }
 
@@ -43,7 +59,7 @@ public class CommentApiController {
             throw new IllegalArgumentException("게시물이 존재하지 않습니다.");
         }
 
-        return postRepository.findPostComments(postId);
+        return commentRepository.findCommentsByPostId(postId);
     }
 
     @PutMapping("/api/v1/post/{postId}/comment/{commentId}")
