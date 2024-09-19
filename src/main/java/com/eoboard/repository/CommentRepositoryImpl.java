@@ -1,14 +1,12 @@
 package com.eoboard.repository;
 
+import com.eoboard.domain.Comment;
 import com.eoboard.dto.comment.PostCommentDto;
 import com.eoboard.dto.comment.QPostCommentDto;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.eoboard.domain.QComment.comment;
 import static com.eoboard.domain.QMember.member;
@@ -49,5 +47,16 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
             else postCommentDtoList.add(comment);
         });
         return postCommentDtoList;
+    }
+
+    @Override
+    public Optional<Comment> findCommentByIdWithParent(Long commentId) {
+        Comment findComment = queryFactory
+                .select(comment)
+                .from(comment)
+                .leftJoin(comment.parent).fetchJoin()
+                .where(comment.id.eq(commentId))
+                .fetchOne();
+        return Optional.ofNullable(findComment);
     }
 }

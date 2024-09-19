@@ -28,33 +28,19 @@ public class CommentService {
     /**
      * 댓글 작성
      */
-    @Transactional
-    public Long comment(String memberId, Long postId, String content) {
-        Member member = memberRepository.findByMemberId(memberId).get();
-        Post post = postRepository.findById(postId).orElseThrow(NoSuchElementException::new);
-
-        Comment comment = Comment.createComment(member, post, content);
-
-        commentRepository.save(comment);
-
-        return comment.getId();
-    }
 
     @Transactional
     public Long createComment(String memberId, Long postId, String content, Long parentId) {
         Member findMember = memberRepository.findByMemberId(memberId).orElseThrow(NoSuchElementException::new);
         Post findPost = postRepository.findById(postId).orElseThrow(NoSuchElementException::new);
 
-        Comment comment = new Comment(content);
+        Comment comment = new Comment(content, findMember, findPost);
         Comment parentComment;
         if (parentId != null) {
             parentComment = commentRepository.findById(parentId).orElseThrow(NoSuchElementException::new);
             comment.updateParent(parentComment);
         }
-        comment.updateMember(findMember);
-        comment.updatePost(findPost);
         comment.updateCreatedAt();
-        comment.updateIsDeleted(false);
 
         commentRepository.save(comment);
         return comment.getId();
@@ -66,16 +52,32 @@ public class CommentService {
     @Transactional
     public void updateComment(Long commentId, String content) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(NoSuchElementException::new);
-        comment.setContent(content);
-        comment.updateCreatedAt();
+        comment.updateContent(content);
+        comment.updateUpdatedAt();
     }
 
     /**
      * 댓글 삭제
      */
+
     @Transactional
     public void deleteComment(Long commentId) {
-        Comment comment = commentRepository.findById(commentId).orElseThrow(NoSuchElementException::new);
-        commentRepository.delete(comment);
+        Comment comment = commentRepository.findCommentByIdWithParent(commentId).orElseThrow(NoSuchElementException::new);
+        System.out.println(comment.getChildren());
+
+        if (comment.getChildren().size() != 0) {
+            comment.updateIsDeleted(true);
+            comment.updateDeletedAt();
+        } else {
+            commentRepository.delete(getDeletableAncestorComment(comment));
+        }
+    }
+
+    private Comment getDeletableAncestorComment(Comment comment) {
+        Comment parent = comment.getParent();
+        if (parent != null && parent.getChildren().size() == 1 && parent.getIsDeleted()) {
+            return getDeletableAncestorComment(parent);
+        }
+        return comment;
     }
 }

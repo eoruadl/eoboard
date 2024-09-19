@@ -18,4 +18,12 @@ public abstract class BaseTimeEntity {
         this.createdAt = LocalDateTime.now();
     }
 
+    public void updateUpdatedAt() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void updateDeletedAt() {
+        this.deletedAt = LocalDateTime.now();
+    }
+
 }

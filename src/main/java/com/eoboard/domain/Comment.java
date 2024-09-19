@@ -40,35 +40,24 @@ public class Comment extends BaseTimeEntity {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    public Comment(String content) {
+    public Comment(String content, Member member, Post post) {
         this.content = content;
-    }
-
-    public static Comment createComment(Member member, Post post, String content) {
-        Comment comment = new Comment(content);
-        comment.setMember(member);
-        comment.setPost(post);
-        comment.updateCreatedAt();
-        return comment;
-    }
-
-    public void updateMember(Member member) {
         this.member = member;
+        this.post = post;
+        this.isDeleted = false;
+    }
+
+
+    public void updateContent(String content) {
+        this.content = content;
     }
 
     public void updateParent(Comment comment) {
         this.parent = comment;
     }
 
-    public void updateChildren(Comment comment) {
-        children.add(comment);
-    }
-
     public void updateIsDeleted(Boolean isDeleted) {
         this.isDeleted = isDeleted;
     }
 
-    public void updatePost(Post post) {
-        this.post = post;
-    }
 }
