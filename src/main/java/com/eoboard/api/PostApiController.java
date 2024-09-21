@@ -2,11 +2,12 @@ package com.eoboard.api;
 
 import com.eoboard.dto.post.PostDto;
 import com.eoboard.dto.post.PostPageDto;
+import com.eoboard.dto.post.PostRequestDto;
+import com.eoboard.dto.post.PostResponseDto;
 import com.eoboard.repository.PostRepository;
 import com.eoboard.service.MemberService;
 import com.eoboard.service.PostService;
 import jakarta.validation.Valid;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,13 +25,13 @@ public class PostApiController {
     private final PostRepository postRepository;
 
     @PostMapping("/api/v1/post")
-    public PostResponse createPost(@RequestBody @Valid PostRequest request, Principal principal) {
+    public PostResponseDto createPost(@RequestBody @Valid PostRequestDto request, Principal principal) {
 
         Long memberId = memberService.findOneByMemberId(principal.getName()).getId();
 
-        Long postId = postService.post(memberId, request.topic, request.title, request.content);
+        Long postId = postService.post(memberId, request.getTopic(), request.getTitle(), request.getContent());
 
-        return new PostResponse(postId);
+        return new PostResponseDto(postId);
     }
 
     @GetMapping("/api/v1/post")
@@ -49,9 +50,9 @@ public class PostApiController {
     }
 
     @PutMapping("/api/v1/post/{postId}")
-    public PostResponse updatePost(
+    public PostResponseDto updatePost(
             @PathVariable("postId") Long postId,
-            @RequestBody @Valid PostRequest request, Principal principal) {
+            @RequestBody @Valid PostRequestDto request, Principal principal) {
         Long memberId = memberService.findOneByMemberId(principal.getName()).getId();
         PostDto post = postRepository.findPost(postId);
         if (post == null) {
@@ -63,12 +64,12 @@ public class PostApiController {
             throw new AccessDeniedException("권한이 없습니다.");
         }
 
-        postService.updatePost(postId, request.topic, request.title, request.content);
-        return new PostResponse(postId);
+        postService.updatePost(postId, request.getTopic(), request.getTitle(), request.getContent());
+        return new PostResponseDto(postId);
     }
 
     @DeleteMapping("/api/v1/post/{postId}")
-    public PostResponse deletePost(@PathVariable("postId") Long postId, Principal principal) {
+    public PostResponseDto deletePost(@PathVariable("postId") Long postId, Principal principal) {
         Long memberId = memberService.findOneByMemberId(principal.getName()).getId();
         PostDto post = postRepository.findPost(postId);
         if (post == null) {
@@ -81,43 +82,6 @@ public class PostApiController {
         }
 
         postService.deletePost(postId);
-        return new PostResponse(postId);
+        return new PostResponseDto(postId);
     }
-
-    @Data
-    static class PostRequest {
-        private String topic;
-        private String title;
-        private String content;
-
-    }
-
-    @Data
-    static class PostResponse {
-        private Long post_id;
-
-        public PostResponse(Long post_id) {
-            this.post_id = post_id;
-        }
-    }
-
-    @Data
-    static class UpdatePostResponse {
-
-        private Long post_id;
-        private String topic;
-        private String title;
-        private String content;
-
-        public UpdatePostResponse(Long post_id, String topic, String title, String content) {
-            this.post_id = post_id;
-            this.topic = topic;
-            this.title = title;
-            this.content = content;
-        }
-    }
-
-
-
-
 }

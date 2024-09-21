@@ -1,12 +1,9 @@
 package com.eoboard.dto.post;
 
-import com.eoboard.domain.Comment;
-import com.eoboard.dto.comment.PostCommentDto;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 public class PostDto {

@@ -5,18 +5,15 @@ import com.eoboard.domain.Member;
 import com.eoboard.dto.comment.PostCommentDto;
 import com.eoboard.repository.CommentRepository;
 import com.eoboard.repository.PostRepository;
-import com.sun.source.tree.LiteralTree;
 import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -52,12 +49,12 @@ public class CommentServiceTest {
         assertEquals("댓글을 작성합니다.", comments.get(0).getContent());
 
         // 대댓글 작성
-        Member member2 = new Member();
-        member2.setMemberId("eorua");
-        member2.setPassword(bCryptPasswordEncoder.encode("1234"));
-        member2.setNickName("nick1");
-        member2.setName("name1");
-        member2.setEmail("test1@gmail.com");
+        Member member2 = new Member(
+                "eorua",
+                bCryptPasswordEncoder.encode("1234"),
+                "nick1",
+                "name1",
+                "test1@gmail.com");
         em.persist(member2);
 
         Long commentId2 = commentService.createComment(member2.getMemberId(), postId, "대댓글을 작성합니다.", commentId);
@@ -156,12 +153,12 @@ public class CommentServiceTest {
     }
 
     private Member createMember() {
-        Member member = new Member();
-        member.setMemberId("eoruadl");
-        member.setPassword(bCryptPasswordEncoder.encode("1234"));
-        member.setNickName("nick");
-        member.setName("name");
-        member.setEmail("test@gmail.com");
+        Member member = new Member(
+                "eoruadl",
+                bCryptPasswordEncoder.encode("1234"),
+                "nick",
+                "name",
+                "test@gmail.com");
         em.persist(member);
         return member;
     }

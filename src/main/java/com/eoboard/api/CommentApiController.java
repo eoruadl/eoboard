@@ -1,5 +1,7 @@
 package com.eoboard.api;
 
+import com.eoboard.dto.comment.CommentRequestDto;
+import com.eoboard.dto.comment.CommentResponseDto;
 import com.eoboard.dto.comment.PostCommentDto;
 import com.eoboard.dto.post.PostDto;
 import com.eoboard.repository.CommentRepository;
@@ -7,7 +9,6 @@ import com.eoboard.repository.PostRepository;
 import com.eoboard.service.CommentService;
 import com.eoboard.service.MemberService;
 import jakarta.validation.Valid;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +27,7 @@ public class CommentApiController {
 
 
     @PostMapping("/api/v1/post/{postId}/comment")
-    public CommentResponse createParentComment(@PathVariable("postId") Long postId, @RequestBody @Valid CommentRequest request, Principal principal) {
+    public CommentResponseDto createParentComment(@PathVariable("postId") Long postId, @RequestBody @Valid CommentRequestDto request, Principal principal) {
         PostDto post = postRepository.findPost(postId);
         if (post == null) {
             throw new IllegalArgumentException("게시물이 존재하지 않습니다.");
@@ -34,13 +35,13 @@ public class CommentApiController {
 
         String memberId = principal.getName();
 
-        Long commentId = commentService.createComment(memberId, postId, request.content, null);
-        return new CommentResponse(commentId);
+        Long commentId = commentService.createComment(memberId, postId, request.getContent(), null);
+        return new CommentResponseDto(commentId);
     }
 
     @PostMapping("/api/v1/post/{postId}/comment/{parentId}")
-    public CommentResponse createChildComment(@PathVariable("postId") Long postId, @PathVariable("parentId") Long parentId,
-                                         @RequestBody @Valid CommentRequest request, Principal principal) {
+    public CommentResponseDto createChildComment(@PathVariable("postId") Long postId, @PathVariable("parentId") Long parentId,
+                                         @RequestBody @Valid CommentRequestDto request, Principal principal) {
         PostDto post = postRepository.findPost(postId);
         if (post == null) {
             throw new IllegalArgumentException("게시물이 존재하지 않습니다.");
@@ -48,8 +49,8 @@ public class CommentApiController {
 
         String memberId = principal.getName();
 
-        Long commentId = commentService.createComment(memberId, postId, request.content, parentId);
-        return new CommentResponse(commentId);
+        Long commentId = commentService.createComment(memberId, postId, request.getContent(), parentId);
+        return new CommentResponseDto(commentId);
     }
 
     @GetMapping("/api/v1/post/{postId}/comment")
@@ -63,8 +64,8 @@ public class CommentApiController {
     }
 
     @PutMapping("/api/v1/post/{postId}/comment/{commentId}")
-    public CommentResponse updateComment(@PathVariable("postId") Long postId, @PathVariable("commentId") Long commentId
-            , @RequestBody @Valid CommentRequest request, Principal principal) {
+    public CommentResponseDto updateComment(@PathVariable("postId") Long postId, @PathVariable("commentId") Long commentId
+            , @RequestBody @Valid CommentRequestDto request, Principal principal) {
 
         PostDto post = postRepository.findPost(postId);
         if (post == null) {
@@ -77,12 +78,12 @@ public class CommentApiController {
             throw new AccessDeniedException("권한이 없습니다.");
         }
 
-        commentService.updateComment(commentId, request.content);
-        return new CommentResponse(commentId);
+        commentService.updateComment(commentId, request.getContent());
+        return new CommentResponseDto(commentId);
     }
 
     @DeleteMapping("/api/v1/post/{postId}/comment/{commentId}")
-    public CommentResponse deleteComment(@PathVariable("postId") Long postId, @PathVariable("commentId") Long commentId, Principal principal) {
+    public CommentResponseDto deleteComment(@PathVariable("postId") Long postId, @PathVariable("commentId") Long commentId, Principal principal) {
         PostDto post = postRepository.findPost(postId);
         if (post == null) {
             throw new IllegalArgumentException("게시물이 존재하지 않습니다.");
@@ -95,23 +96,6 @@ public class CommentApiController {
         }
 
         commentService.deleteComment(commentId);
-        return new CommentResponse(commentId);
+        return new CommentResponseDto(commentId);
     }
-
-    @Data
-    static class CommentRequest {
-        private String content;
-    }
-
-    @Data
-    static class CommentResponse {
-        private Long commentId;
-
-        public CommentResponse(Long commentId) {
-            this.commentId = commentId;
-        }
-    }
-
-
-
 }

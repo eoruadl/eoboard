@@ -180,12 +180,12 @@ public class PostServiceTest {
     }
 
     private Member createMember() {
-        Member member = new Member();
-        member.setMemberId("eoruadl");
-        member.setPassword(bCryptPasswordEncoder.encode("1234"));
-        member.setNickName("nick");
-        member.setName("name");
-        member.setEmail("test@gmail.com");
+        Member member = new Member(
+                "eoruadl",
+                bCryptPasswordEncoder.encode("1234"),
+                "nick",
+                "name",
+                "test@gmail.com");
         em.persist(member);
         return member;
     }

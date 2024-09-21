@@ -1,6 +1,9 @@
 package com.eoboard.api;
 
 import com.eoboard.domain.Member;
+import com.eoboard.domain.Role;
+import com.eoboard.dto.member.MemberRequestDto;
+import com.eoboard.dto.member.MemberResponseDto;
 import com.eoboard.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.Data;
@@ -18,43 +21,23 @@ public class MemberApiController {
     private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/api/v1/auth/signup")
-    public CreateMemberResponse saveMember(@RequestBody @Valid CreateMemberRequest request) {
+    public MemberResponseDto saveMember(@RequestBody @Valid MemberRequestDto request) {
 
-        Member member = new Member();
-        member.setMemberId(request.getMemberId());
-        member.setPassword(passwordEncoder.encode(request.getPassword()));
-        member.setName(request.getName());
-        member.setNickName(request.getNickName());
-        member.setEmail(request.getEmail());
+        Member member = new Member(
+                request.getMemberId(),
+                passwordEncoder.encode(request.getPassword()),
+                request.getNickName(),
+                request.getName(),
+                request.getEmail());
+
         member.updateCreatedAt();
 
-        Long saveId = memberService.join(member);
-        return new CreateMemberResponse(saveId);
-    }
-
-    @Data
-    static class CreateMemberRequest {
-        private String memberId;
-        private String password;
-        private String name;
-        private String nickName;
-        private String email;
-    }
-
-    @Data
-    static class CreateMemberResponse {
-        private Long id;
-
-        public CreateMemberResponse(Long id) {
-            this.id = id;
+        if (request.getRole().equals(Role.ADMIN)) {
+            member.updateRole(Role.ADMIN);
         }
-    }
 
-    @Data
-    static class LoginMemberRequest {
-        private String memberId;
-        private String password;
+        Long saveId = memberService.join(member);
+        return new MemberResponseDto(saveId);
     }
-
 }
 

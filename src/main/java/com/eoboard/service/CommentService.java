@@ -3,7 +3,6 @@ package com.eoboard.service;
 import com.eoboard.domain.Comment;
 import com.eoboard.domain.Member;
 import com.eoboard.domain.Post;
-import com.eoboard.dto.comment.PostCommentDto;
 import com.eoboard.repository.CommentRepository;
 import com.eoboard.repository.MemberRepository;
 import com.eoboard.repository.PostRepository;
@@ -11,10 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -63,7 +59,6 @@ public class CommentService {
     @Transactional
     public void deleteComment(Long commentId) {
         Comment comment = commentRepository.findCommentByIdWithParent(commentId).orElseThrow(NoSuchElementException::new);
-        System.out.println(comment.getChildren());
 
         if (comment.getChildren().size() != 0) {
             comment.updateIsDeleted(true);
