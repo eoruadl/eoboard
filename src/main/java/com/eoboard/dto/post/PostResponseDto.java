@@ -4,9 +4,9 @@ import lombok.Data;
 
 @Data
 public class PostResponseDto {
-    private Long post_id;
+    private Long postId;
 
-    public PostResponseDto(Long post_id) {
-        this.post_id = post_id;
+    public PostResponseDto(Long postId) {
+        this.postId = postId;
     }
 }

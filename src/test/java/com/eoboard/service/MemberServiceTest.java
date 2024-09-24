@@ -2,9 +2,7 @@ package com.eoboard.service;
 
 import com.eoboard.domain.Member;
 import com.eoboard.domain.Role;
-import com.eoboard.dto.member.MemberDto;
 import com.eoboard.dto.member.MemberRequestDto;
-import com.eoboard.repository.MemberRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.servlet.ServletException;
@@ -143,7 +141,7 @@ public class MemberServiceTest {
                         responseFields(
                                 fieldWithPath("message").type(JsonFieldType.STRING).description("로그인 메시지"),
                                 fieldWithPath("memberId").type(JsonFieldType.STRING).description("멤버 아이디")
-                        )));;
+                        )));
     }
 
     @Test

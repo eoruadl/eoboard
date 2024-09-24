@@ -1,6 +1,7 @@
 package com.eoboard.service;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
@@ -15,8 +16,8 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
 
         final UsernamePasswordAuthenticationToken authenticationToken
                 = new UsernamePasswordAuthenticationToken(annotation.username(),
-                "1234",
-                Arrays.asList());
+                "",
+                Arrays.asList(new SimpleGrantedAuthority("ADMIN")));
 
         securityContext.setAuthentication(authenticationToken);
         return securityContext;
