@@ -158,6 +158,19 @@ public class MemberServiceTest {
                 .andExpect(status().is4xxClientError());
     }
 
+    @Test
+    public void 로그아웃() throws Exception {
+        mockMvc.perform(post("/api/v1/auth/logout")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(document("member/logout",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        responseFields(
+                                fieldWithPath("message").type(JsonFieldType.STRING).description("로그아웃 메시지")
+                        )));
+    }
+
     private Member createMember() {
         Member member = new Member(
                 "eoruadl",

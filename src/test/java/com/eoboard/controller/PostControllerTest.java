@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
@@ -28,6 +29,8 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
@@ -78,11 +81,16 @@ public class PostControllerTest {
 
         mockMvc.perform(post("/api/v1/post")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(request)))
+                .content(om.writeValueAsString(request))
+                .header(HttpHeaders.AUTHORIZATION, "JWT"))
                 .andExpect(status().isOk())
                 .andDo(document("post/create",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Authorization").description("Bearer 토큰으로 인증"),
+                                headerWithName("Content-Type").description("application/json")
+                        ),
                         requestFields(
                                 fieldWithPath("topic").type(JsonFieldType.STRING).description("토픽"),
                                 fieldWithPath("title").type(JsonFieldType.STRING).description("제목"),
@@ -98,11 +106,15 @@ public class PostControllerTest {
     public void 게시물_전체_조회() throws Exception {
 
         mockMvc.perform(get("/api/v1/post")
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON).
+                        header(HttpHeaders.AUTHORIZATION, "JWT"))
                 .andExpect(status().isOk())
                 .andDo(document("post/findAll",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Authorization").description("Bearer 토큰으로 인증")
+                        ),
                         responseFields(
                                 fieldWithPath("content").type(JsonFieldType.ARRAY).description("응답 내용"),
                                 fieldWithPath("content[].postId").type(JsonFieldType.NUMBER).description("게시물_ID"),
@@ -139,7 +151,6 @@ public class PostControllerTest {
                                 fieldWithPath("numberOfElements").type(JsonFieldType.NUMBER).description("현재 페이지의 항목수"),
                                 fieldWithPath("empty").type(JsonFieldType.BOOLEAN).description("현재 페이지가 비어있는지 유무")
                         )));
-
     }
 
     @Test
@@ -149,11 +160,15 @@ public class PostControllerTest {
         Long id = all.get(0).getId();
 
         mockMvc.perform(get("/api/v1/post/" + id)
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON).
+                        header(HttpHeaders.AUTHORIZATION, "JWT"))
                 .andExpect(status().isOk())
                 .andDo(document("post/findOne",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Authorization").description("Bearer 토큰으로 인증")
+                        ),
                         responseFields(
                                 fieldWithPath("postId").type(JsonFieldType.NUMBER).description("게시물_ID"),
                                 fieldWithPath("topic").type(JsonFieldType.STRING).description("토픽"),
@@ -177,12 +192,17 @@ public class PostControllerTest {
         request.setContent("post test");
 
         mockMvc.perform(put("/api/v1/post/" + id).
-                        contentType(MediaType.APPLICATION_JSON)
+                        contentType(MediaType.APPLICATION_JSON).
+                        header(HttpHeaders.AUTHORIZATION, "JWT")
                         .content(om.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andDo(document("post/update",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Authorization").description("Bearer 토큰으로 인증"),
+                                headerWithName("Content-Type").description("application/json")
+                        ),
                         responseFields(
                                 fieldWithPath("postId").type(JsonFieldType.NUMBER).description("게시물_ID")
                                 )));
@@ -195,11 +215,15 @@ public class PostControllerTest {
         Long id = all.get(0).getId();
 
         mockMvc.perform(delete("/api/v1/post/" + id).
-                        contentType(MediaType.APPLICATION_JSON))
+                        contentType(MediaType.APPLICATION_JSON).
+                        header(HttpHeaders.AUTHORIZATION, "JWT"))
                 .andExpect(status().isOk())
                 .andDo(document("post/delete",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Authorization").description("Bearer 토큰으로 인증")
+                        ),
                         responseFields(
                                 fieldWithPath("postId").type(JsonFieldType.NUMBER).description("게시물_ID")
                         )));
