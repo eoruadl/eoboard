@@ -1,8 +1,11 @@
 package com.eoboard.controller;
 
+import com.eoboard.domain.Comment;
 import com.eoboard.domain.Member;
 import com.eoboard.domain.Post;
-import com.eoboard.dto.post.PostRequestDto;
+import com.eoboard.domain.Role;
+import com.eoboard.dto.member.MemberRequestDto;
+import com.eoboard.repository.CommentRepository;
 import com.eoboard.repository.MemberRepository;
 import com.eoboard.repository.PostRepository;
 import com.eoboard.service.WithMockCustomUser;
@@ -45,7 +48,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @AutoConfigureMockMvc
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
-public class PostControllerTest {
+public class AdminControllerTest {
 
     @Autowired
     BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -59,6 +62,8 @@ public class PostControllerTest {
     MemberRepository memberRepository;
     @Autowired
     PostRepository postRepository;
+    @Autowired
+    CommentRepository commentRepository;
 
     @BeforeEach
     void setUp(WebApplicationContext webApplicationContext, RestDocumentationContextProvider restDocumentation) {
@@ -68,48 +73,18 @@ public class PostControllerTest {
                 .build();
 
         Long memberId = createMember().getId();
-        initPosts(memberId);
+        initComments(memberId);
     }
 
     @Test
     @WithMockCustomUser
-    public void 게시물_생성() throws Exception {
-        PostRequestDto request = new PostRequestDto();
-        request.setTopic("test");
-        request.setTitle("post");
-        request.setContent("post test");
+    public void 멤버_전체_조회() throws Exception {
 
-        mockMvc.perform(post("/api/v1/post")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(request))
-                .header(HttpHeaders.AUTHORIZATION, "JWT"))
+        mockMvc.perform(get("/admin/members")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, "JWT"))
                 .andExpect(status().isOk())
-                .andDo(document("post/create",
-                        preprocessRequest(prettyPrint()),
-                        preprocessResponse(prettyPrint()),
-                        requestHeaders(
-                                headerWithName("Authorization").description("Bearer 토큰으로 인증"),
-                                headerWithName("Content-Type").description("application/json")
-                        ),
-                        requestFields(
-                                fieldWithPath("topic").type(JsonFieldType.STRING).description("토픽"),
-                                fieldWithPath("title").type(JsonFieldType.STRING).description("제목"),
-                                fieldWithPath("content").type(JsonFieldType.STRING).description("내용")
-                        ),
-                        responseFields(
-                                fieldWithPath("postId").type(JsonFieldType.NUMBER).description("게시물_ID")
-                        )));
-    }
-
-    @Test
-    @WithMockCustomUser
-    public void 게시물_전체_조회() throws Exception {
-
-        mockMvc.perform(get("/api/v1/post")
-                        .contentType(MediaType.APPLICATION_JSON).
-                        header(HttpHeaders.AUTHORIZATION, "JWT"))
-                .andExpect(status().isOk())
-                .andDo(document("post/findAll",
+                .andDo(document("admin/members-findAll",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestHeaders(
@@ -117,13 +92,11 @@ public class PostControllerTest {
                         ),
                         responseFields(
                                 fieldWithPath("content").type(JsonFieldType.ARRAY).description("응답 내용"),
-                                fieldWithPath("content[].postId").type(JsonFieldType.NUMBER).description("게시물_ID"),
-                                fieldWithPath("content[].topic").type(JsonFieldType.STRING).description("토픽"),
-                                fieldWithPath("content[].title").type(JsonFieldType.STRING).description("제목"),
-                                fieldWithPath("content[].memberId").type(JsonFieldType.NUMBER).description("멤버_ID"),
+                                fieldWithPath("content[].memberId").type(JsonFieldType.NUMBER).description("멤버 ID"),
+                                fieldWithPath("content[].id").type(JsonFieldType.STRING).description("아이디"),
                                 fieldWithPath("content[].nickName").type(JsonFieldType.STRING).description("닉네임"),
-                                fieldWithPath("content[].createdAt").type(JsonFieldType.STRING).description("생성일자"),
-                                fieldWithPath("content[].updatedAt").type(JsonFieldType.STRING).description("수정일자").optional(),
+                                fieldWithPath("content[].email").type(JsonFieldType.STRING).description("이메일"),
+                                fieldWithPath("content[].role").type(JsonFieldType.STRING).description("권한"),
 
                                 fieldWithPath("pageable").type(JsonFieldType.OBJECT).description("페이징"),
                                 fieldWithPath("pageable.pageNumber").type(JsonFieldType.NUMBER).description("요청 페이지 번호"),
@@ -151,79 +124,80 @@ public class PostControllerTest {
                                 fieldWithPath("numberOfElements").type(JsonFieldType.NUMBER).description("현재 페이지의 항목수"),
                                 fieldWithPath("empty").type(JsonFieldType.BOOLEAN).description("현재 페이지가 비어있는지 유무")
                         )));
+
     }
 
     @Test
     @WithMockCustomUser
-    public void 게시물_단건_조회() throws Exception {
-        List<Post> all = postRepository.findAll();
-        Long id = all.get(0).getId();
+    public void 멤버_수정() throws Exception {
+        MemberRequestDto request = new MemberRequestDto();
+        request.setMemberId("memberId");
+        request.setPassword("1234");
+        request.setName("name");
+        request.setNickName("nickName");
+        request.setEmail("email@gmail.com");
+        request.setRole(Role.ADMIN);
 
-        mockMvc.perform(get("/api/v1/post/" + id)
-                        .contentType(MediaType.APPLICATION_JSON).
-                        header(HttpHeaders.AUTHORIZATION, "JWT"))
+        List<Member> members = memberRepository.findAll();
+        Long memberId = members.get(0).getId();
+
+        mockMvc.perform(put("/admin/members/" + memberId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(om.writeValueAsString(request))
+                        .header(HttpHeaders.AUTHORIZATION, "JWT"))
                 .andExpect(status().isOk())
-                .andDo(document("post/findOne",
+                .andDo(document("admin/member-update",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Authorization").description("Bearer 토큰으로 인증")
+                        ),
+                        requestFields(
+                                fieldWithPath("memberId").type(JsonFieldType.STRING).description("멤버 아이디"),
+                                fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호"),
+                                fieldWithPath("name").type(JsonFieldType.STRING).description("이름"),
+                                fieldWithPath("nickName").type(JsonFieldType.STRING).description("닉네임"),
+                                fieldWithPath("email").type(JsonFieldType.STRING).description("이메일"),
+                                fieldWithPath("role").type(JsonFieldType.STRING).description("권한")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").type(JsonFieldType.NUMBER).description("멤버 ID")
+                        )));
+    }
+
+    @Test
+    public void 멤버_삭제() throws Exception {
+
+        List<Member> members = memberRepository.findAll();
+        Long memberId = members.get(0).getId();
+
+        mockMvc.perform(delete("/admin/members/" + memberId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, "JWT"))
+                .andExpect(status().isOk())
+                .andDo(document("admin/member-delete",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestHeaders(
                                 headerWithName("Authorization").description("Bearer 토큰으로 인증")
                         ),
                         responseFields(
-                                fieldWithPath("postId").type(JsonFieldType.NUMBER).description("게시물_ID"),
-                                fieldWithPath("topic").type(JsonFieldType.STRING).description("토픽"),
-                                fieldWithPath("title").type(JsonFieldType.STRING).description("제목"),
-                                fieldWithPath("content").type(JsonFieldType.STRING).description("내용"),
-                                fieldWithPath("memberId").type(JsonFieldType.NUMBER).description("멤버_ID"),
-                                fieldWithPath("nickName").type(JsonFieldType.STRING).description("닉네임"),
-                                fieldWithPath("createdAt").type(JsonFieldType.STRING).description("생성일자"),
-                                fieldWithPath("updatedAt").type(JsonFieldType.STRING).description("수정일자").optional())));
-    }
-
-    @Test
-    @WithMockCustomUser
-    public void 게시물_수정() throws Exception {
-        List<Post> all = postRepository.findAll();
-        Long id = all.get(0).getId();
-
-        PostRequestDto request = new PostRequestDto();
-        request.setTopic("test");
-        request.setTitle("post");
-        request.setContent("post test");
-
-        mockMvc.perform(put("/api/v1/post/" + id).
-                        contentType(MediaType.APPLICATION_JSON).
-                        header(HttpHeaders.AUTHORIZATION, "JWT")
-                        .content(om.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andDo(document("post/update",
-                        preprocessRequest(prettyPrint()),
-                        preprocessResponse(prettyPrint()),
-                        requestHeaders(
-                                headerWithName("Authorization").description("Bearer 토큰으로 인증"),
-                                headerWithName("Content-Type").description("application/json")
-                        ),
-                        requestFields(
-                                fieldWithPath("topic").type(JsonFieldType.STRING).description("토픽"),
-                                fieldWithPath("title").type(JsonFieldType.STRING).description("제목"),
-                                fieldWithPath("content").type(JsonFieldType.STRING).description("내용")
-                        ),
-                        responseFields(
-                                fieldWithPath("postId").type(JsonFieldType.NUMBER).description("게시물_ID")
-                                )));
+                                fieldWithPath("id").type(JsonFieldType.NUMBER).description("멤버 ID")
+                        )));
     }
 
     @Test
     @WithMockCustomUser
     public void 게시물_삭제() throws Exception {
-        List<Post> all = postRepository.findAll();
-        Long id = all.get(0).getId();
+        List<Post> allPost = postRepository.findAll();
+        Long postId = allPost.get(0).getId();
 
-        mockMvc.perform(delete("/api/v1/post/" + id).
-                        contentType(MediaType.APPLICATION_JSON).
-                        header(HttpHeaders.AUTHORIZATION, "JWT"))
+
+        mockMvc.perform(delete("/admin/post/" + postId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, "JWT"))
                 .andExpect(status().isOk())
-                .andDo(document("post/delete",
+                .andDo(document("admin/post-delete",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestHeaders(
@@ -234,6 +208,34 @@ public class PostControllerTest {
                         )));
     }
 
+    @Test
+    @WithMockCustomUser
+    public void 댓글_삭제() throws Exception {
+        List<Post> allPost = postRepository.findAll();
+        Long postId = allPost.get(0).getId();
+
+        List<Comment> allComment = commentRepository.findAll();
+        Long commentId = allComment.get(0).getId();
+
+        mockMvc.perform(delete("/admin/post/" + postId + "/comment/" + commentId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, "JWT"))
+                .andExpect(status().isOk())
+                .andDo(document("admin/comment-delete",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Authorization").description("Bearer 토큰으로 인증")
+                        ),
+                        responseFields(
+                                fieldWithPath("commentId").type(JsonFieldType.NUMBER).description("댓글 ID")
+                        )));
+
+    }
+
+
+
+
 
     private Member createMember() {
         Member member = new Member(
@@ -242,18 +244,41 @@ public class PostControllerTest {
                 "nick",
                 "name",
                 "test@gmail.com");
+        member.updateRole(Role.ADMIN);
         em.persist(member);
         return member;
     }
 
-    private void initPosts(Long memberId) {
+    private void initComments(Long memberId) {
         Member member = memberRepository.findById(memberId).orElseThrow(NoSuchElementException::new);
         String topic = "test";
-        for (int i = 0; i < 5; i++) {
-            String title = "title" + (i + 1);
-            String content = "content" + (i + 1);
-            Post post = Post.createPost(member, topic, title, content);
-            postRepository.save(post);
+        String title = "title";
+        String content = "content";
+        Post post = Post.createPost(member, topic, title, content);
+        postRepository.save(post);
+
+        for (int i = 0; i < 3; i++) {
+            String commentContent = "comment" + (i + 1);
+            Comment comment = new Comment(commentContent, member, post);
+            comment.updateCreatedAt();
+            commentRepository.save(comment);
         }
+
+        List<Comment> all = commentRepository.findAll();
+        Long parentId = all.get(0).getId();
+
+        Comment parentComment = commentRepository.findById(parentId).orElseThrow(NoSuchElementException::new);
+
+        content = "childContent";
+        Comment childComment = new Comment(content, member, post);
+        childComment.updateParent(parentComment);
+        childComment.updateCreatedAt();
+        commentRepository.save(childComment);
+
+        content = "cchildContent";
+        Comment cchildComment = new Comment(content, member, post);
+        cchildComment.updateParent(childComment);
+        cchildComment.updateCreatedAt();
+        commentRepository.save(cchildComment);
     }
 }
