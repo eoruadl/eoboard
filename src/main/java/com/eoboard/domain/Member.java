@@ -38,6 +38,12 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member")
     private List<Comment> comments = new ArrayList<>();
 
+    @OneToMany(mappedBy = "member")
+    private List<PostLike> PostLikes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member")
+    private List<CommentLike> commentLikes = new ArrayList<>();
+
     public Member(String memberId, String password, String nickName, String name, String email) {
         this.memberId = memberId;
         this.password = password;

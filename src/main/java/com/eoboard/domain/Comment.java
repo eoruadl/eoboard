@@ -1,6 +1,7 @@
 package com.eoboard.domain;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter @Setter
 public class Comment extends BaseTimeEntity {
 
@@ -20,6 +21,7 @@ public class Comment extends BaseTimeEntity {
     private Long id;
 
     private String content;
+    private int likeCount;
 
     @ColumnDefault("FALSE")
     @Column(nullable = false)
@@ -40,6 +42,9 @@ public class Comment extends BaseTimeEntity {
     @JoinColumn(name = "post_id")
     private Post post;
 
+    @OneToMany(mappedBy = "comment")
+    private List<CommentLike> commentLikes = new ArrayList<>();
+
     public Comment(String content, Member member, Post post) {
         this.content = content;
         this.member = member;
@@ -58,6 +63,14 @@ public class Comment extends BaseTimeEntity {
 
     public void updateIsDeleted(Boolean isDeleted) {
         this.isDeleted = isDeleted;
+    }
+
+    public void upLike() {
+        this.likeCount++;
+    }
+
+    public void downLike() {
+        this.likeCount--;
     }
 
 }

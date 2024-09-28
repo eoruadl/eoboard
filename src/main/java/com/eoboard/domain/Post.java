@@ -18,6 +18,7 @@ public class Post extends BaseTimeEntity {
     private String topic;
     private String title;
     private String content;
+    private int likeCount;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -25,6 +26,9 @@ public class Post extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "post")
     private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post")
+    private List<PostLike> postLikes = new ArrayList<>();
 
     public static Post createPost(Member member, String topic, String title, String content) {
         Post post = new Post();
@@ -34,5 +38,13 @@ public class Post extends BaseTimeEntity {
         post.setContent(content);
         post.updateCreatedAt();
         return post;
+    }
+
+    public void upLike() {
+        this.likeCount++;
+    }
+
+    public void downLike() {
+        this.likeCount--;
     }
 }
