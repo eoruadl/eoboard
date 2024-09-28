@@ -1,0 +1,219 @@
+ifndef::snippets[]
+:snippets: ../../../build/generated-snippets
+endif::[]
+= Eoboard REST API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+:operation-http-request-title: Example Request
+:operation-http-response-title: Example Response
+
+== MemberAPI
+
+=== 회원가입
+
+==== Request
+include::{snippets}/member/sign-up/http-request.adoc[]
+include::{snippets}/member/sign-up/request-fields.adoc[]
+
+==== Response
+include::{snippets}/member/sign-up/http-response.adoc[]
+include::{snippets}/member/sign-up/response-fields.adoc[]
+
+=== 로그인
+
+==== Request
+include::{snippets}/member/login/http-request.adoc[]
+include::{snippets}/member/login/request-fields.adoc[]
+
+==== Response
+include::{snippets}/member/login/http-response.adoc[]
+include::{snippets}/member/login/response-fields.adoc[]
+
+=== 로그아웃
+
+==== Request
+include::{snippets}/member/logout/http-request.adoc[]
+
+==== Response
+include::{snippets}/member/logout/http-response.adoc[]
+include::{snippets}/member/logout/response-fields.adoc[]
+
+== PostAPI
+
+=== 게시물 생성
+
+==== Request
+include::{snippets}/post/create/http-request.adoc[]
+include::{snippets}/post/create/request-fields.adoc[]
+
+==== Response
+include::{snippets}/post/create/http-response.adoc[]
+include::{snippets}/post/create/response-fields.adoc[]
+
+=== 게시물 전체 조회
+
+==== Request
+include::{snippets}/post/findAll/http-request.adoc[]
+
+==== Response
+include::{snippets}/post/findAll/http-response.adoc[]
+include::{snippets}/post/findAll/response-fields.adoc[]
+
+=== 게시물 단건 조회
+
+==== Request
+include::{snippets}/post/findOne/http-request.adoc[]
+
+==== Response
+include::{snippets}/post/findOne/http-response.adoc[]
+include::{snippets}/post/findOne/response-fields.adoc[]
+
+=== 게시물 수정
+
+==== Request
+include::{snippets}/post/update/http-request.adoc[]
+
+==== Response
+include::{snippets}/post/update/http-response.adoc[]
+include::{snippets}/post/update/response-fields.adoc[]
+
+=== 게시물 삭제
+
+==== Request
+include::{snippets}/post/update/http-request.adoc[]
+
+==== Response
+include::{snippets}/post/update/http-response.adoc[]
+include::{snippets}/post/update/response-fields.adoc[]
+
+== CommentAPI
+
+=== 댓글 생성
+
+==== Request
+include::{snippets}/comment/create/http-request.adoc[]
+include::{snippets}/comment/create/request-fields.adoc[]
+
+==== Response
+include::{snippets}/comment/create/http-response.adoc[]
+include::{snippets}/comment/create/response-fields.adoc[]
+
+=== 댓글 조회
+
+==== Request
+include::{snippets}/comment/findAll/http-request.adoc[]
+
+==== Response
+include::{snippets}/comment/findAll/http-response.adoc[]
+include::{snippets}/comment/findAll/response-fields.adoc[]
+
+=== 댓글 수정
+
+==== Request
+include::{snippets}/comment/update/http-request.adoc[]
+
+==== Response
+include::{snippets}/comment/update/http-response.adoc[]
+include::{snippets}/comment/update/response-fields.adoc[]
+
+=== 댓글 삭제
+
+==== Request
+include::{snippets}/comment/delete/http-request.adoc[]
+
+==== Response
+include::{snippets}/comment/delete/http-response.adoc[]
+include::{snippets}/comment/delete/response-fields.adoc[]
+
+== AdminAPI
+
+=== 멤버 전체 조회
+
+==== Request
+include::{snippets}/admin/members-findAll/http-request.adoc[]
+
+==== Response
+include::{snippets}/admin/members-findAll/http-response.adoc[]
+include::{snippets}/admin/members-findAll/response-fields.adoc[]
+
+=== 멤버 수정
+
+==== Request
+include::{snippets}/admin/member-update/http-request.adoc[]
+include::{snippets}/admin/member-update/request-fields.adoc[]
+
+==== Response
+include::{snippets}/admin/member-update/http-response.adoc[]
+include::{snippets}/admin/member-update/response-fields.adoc[]
+
+=== 멤버 삭제
+
+==== Request
+include::{snippets}/admin/member-delete/http-request.adoc[]
+
+==== Response
+include::{snippets}/admin/member-delete/http-response.adoc[]
+include::{snippets}/admin/member-delete/response-fields.adoc[]
+
+=== 게시물 삭제
+
+==== Request
+include::{snippets}/admin/post-delete/http-request.adoc[]
+
+==== Response
+include::{snippets}/admin/post-delete/http-response.adoc[]
+include::{snippets}/admin/post-delete/response-fields.adoc[]
+
+=== 댓글 삭제
+
+==== Request
+include::{snippets}/admin/comment-delete/http-request.adoc[]
+
+==== Response
+include::{snippets}/admin/comment-delete/http-response.adoc[]
+include::{snippets}/admin/comment-delete/response-fields.adoc[]
+
+== LikeAPI
+
+=== 게시물 좋아요
+
+==== Request
+include::{snippets}/like/post-like/http-request.adoc[]
+
+==== Response
+include::{snippets}/like/post-like/http-response.adoc[]
+include::{snippets}/like/post-like/response-fields.adoc[]
+
+=== 게시물 좋아요 취소
+
+==== Request
+include::{snippets}/like/post-unlike/http-request.adoc[]
+
+==== Response
+include::{snippets}/like/post-unlike/http-response.adoc[]
+include::{snippets}/like/post-unlike/response-fields.adoc[]
+
+=== 댓글 좋아요
+
+==== Request
+include::{snippets}/like/comment-like/http-request.adoc[]
+
+==== Response
+include::{snippets}/like/comment-like/http-response.adoc[]
+include::{snippets}/like/comment-like/response-fields.adoc[]
+
+=== 댓글 좋아요 취소
+
+==== Request
+include::{snippets}/like/comment-unlike/http-request.adoc[]
+
+==== Response
+include::{snippets}/like/comment-unlike/http-response.adoc[]
+include::{snippets}/like/comment-unlike/response-fields.adoc[]
+
+
+

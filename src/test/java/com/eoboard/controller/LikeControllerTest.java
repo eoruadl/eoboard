@@ -18,7 +18,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
-import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -26,7 +25,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -217,18 +215,4 @@ public class LikeControllerTest {
         cchildComment.updateCreatedAt();
         commentRepository.save(cchildComment);
     }
-
-    private static List<FieldDescriptor> commentFields(String prefix) {
-        return Arrays.asList(
-                fieldWithPath(prefix + "commentId").type(JsonFieldType.NUMBER).description("댓글 ID"),
-                fieldWithPath(prefix + "nickName").type(JsonFieldType.STRING).description("생성자 닉네임"),
-                fieldWithPath(prefix + "content").type(JsonFieldType.STRING).description("내용"),
-                fieldWithPath(prefix + "parentId").type(JsonFieldType.NUMBER).description("부모댓글 ID").optional(),
-                fieldWithPath(prefix + "isDeleted").type(JsonFieldType.BOOLEAN).description("삭제여부"),
-                fieldWithPath(prefix + "createdAt").type(JsonFieldType.STRING).description("생성일자"),
-                fieldWithPath(prefix + "updatedAt").type(JsonFieldType.STRING).description("수정일자").optional(),
-                fieldWithPath(prefix + "children").type(JsonFieldType.ARRAY).description("자식댓글")
-        );
-    }
-
 }
