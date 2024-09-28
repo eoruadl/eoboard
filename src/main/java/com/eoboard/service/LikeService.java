@@ -47,8 +47,9 @@ public class LikeService {
     }
 
     @Transactional
-    public Long likeComment(String memberId, Long commentId) {
+    public Long likeComment(String memberId, Long postId, Long commentId) {
         Member member = memberRepository.findByMemberId(memberId).orElseThrow(NoSuchFieldError::new);
+        Post post = postRepository.findById(postId).orElseThrow(NoSuchFieldError::new);
         Comment comment = commentRepository.findById(commentId).orElseThrow(NoSuchFieldError::new);
 
         Optional<CommentLike> findComment = commentLikeRepository.findByMemberAndComment(member, comment);
@@ -63,8 +64,9 @@ public class LikeService {
     }
 
     @Transactional
-    public void unlikeComment(String memberId, Long commentId) {
+    public void unlikeComment(String memberId, Long postId, Long commentId) {
         Member member = memberRepository.findByMemberId(memberId).orElseThrow(NoSuchFieldError::new);
+        Post post = postRepository.findById(postId).orElseThrow(NoSuchFieldError::new);
         Comment comment = commentRepository.findById(commentId).orElseThrow(NoSuchFieldError::new);
 
         CommentLike commentLike = commentLikeRepository.findByMemberAndComment(member, comment).orElseThrow(NoSuchFieldError::new);

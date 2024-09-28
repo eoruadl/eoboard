@@ -100,7 +100,7 @@ public class LikeServiceTest {
         Long commentId = commentService.createComment(member.getMemberId(), postId, "댓글을 작성합니다.", null);
 
         //when
-        Long likeId = likeService.likeComment(member.getMemberId(), commentId);
+        Long likeId = likeService.likeComment(member.getMemberId(), postId, commentId);
         CommentLike commentLike = commentLikeRepository.findById(likeId).orElseThrow();
 
 
@@ -123,10 +123,10 @@ public class LikeServiceTest {
 
         Long postId = postService.post(member.getId(), "test1", "게시물1", "게시물 작성합니다.");
         Long commentId = commentService.createComment(member.getMemberId(), postId, "댓글을 작성합니다.", null);
-        Long likeId = likeService.likeComment(member.getMemberId(), commentId);
+        Long likeId = likeService.likeComment(member.getMemberId(), postId, commentId);
 
         //when
-        likeService.unlikeComment(member.getMemberId(), commentId);
+        likeService.unlikeComment(member.getMemberId(), postId, commentId);
 
         //then
         Optional<CommentLike> commentLike = commentLikeRepository.findById(likeId);

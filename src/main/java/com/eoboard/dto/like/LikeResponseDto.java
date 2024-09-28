@@ -5,9 +5,9 @@ import lombok.Data;
 @Data
 public class LikeResponseDto {
 
-    private Long likeId;
+    private String content;
 
-    public LikeResponseDto(Long likeId) {
-        this.likeId = likeId;
+    public LikeResponseDto(String content) {
+        this.content = content;
     }
 }
