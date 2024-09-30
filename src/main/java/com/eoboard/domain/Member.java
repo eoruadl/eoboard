@@ -2,6 +2,7 @@ package com.eoboard.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -44,6 +45,7 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member")
     private List<CommentLike> commentLikes = new ArrayList<>();
 
+    @Builder
     public Member(String memberId, String password, String nickName, String name, String email) {
         this.memberId = memberId;
         this.password = password;

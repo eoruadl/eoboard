@@ -23,13 +23,13 @@ public class MemberApiController {
     @PostMapping("/api/v1/auth/signup")
     public MemberResponseDto saveMember(@RequestBody @Valid MemberRequestDto request) {
 
-        Member member = new Member(
-                request.getMemberId(),
-                passwordEncoder.encode(request.getPassword()),
-                request.getNickName(),
-                request.getName(),
-                request.getEmail());
-
+        Member member = Member.builder()
+                .memberId(request.getMemberId())
+                .password(request.getPassword())
+                .nickName(request.getNickName())
+                .name(request.getName())
+                .email(request.getEmail())
+                .build();
         member.updateCreatedAt();
 
         if (request.getRole().equals(Role.ADMIN)) {
