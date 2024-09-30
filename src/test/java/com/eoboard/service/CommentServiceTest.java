@@ -10,7 +10,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -32,8 +31,6 @@ public class CommentServiceTest {
     PostRepository postRepository;
     @Autowired
     EntityManager em;
-    @Autowired
-    BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Test
     public void 댓글_작성() throws Exception {
@@ -49,12 +46,14 @@ public class CommentServiceTest {
         assertEquals("댓글을 작성합니다.", comments.get(0).getContent());
 
         // 대댓글 작성
-        Member member2 = new Member(
-                "eorua",
-                bCryptPasswordEncoder.encode("1234"),
-                "nick1",
-                "name1",
-                "test1@gmail.com");
+        Member member2 = Member.builder()
+                .memberId("eorua")
+                .password("1234")
+                .nickName("nick1")
+                .name("name1")
+                .email("test1@gmail.com")
+                .build();
+        member.updateCreatedAt();
         em.persist(member2);
 
         Long commentId2 = commentService.createComment(member2.getMemberId(), postId, "대댓글을 작성합니다.", commentId);
@@ -153,12 +152,14 @@ public class CommentServiceTest {
     }
 
     private Member createMember() {
-        Member member = new Member(
-                "eoruadl",
-                bCryptPasswordEncoder.encode("1234"),
-                "nick",
-                "name",
-                "test@gmail.com");
+        Member member = Member.builder()
+                .memberId("eoruadl")
+                .password("1234")
+                .nickName("nick")
+                .name("name")
+                .email("test@gmail.com")
+                .build();
+        member.updateCreatedAt();
         em.persist(member);
         return member;
     }

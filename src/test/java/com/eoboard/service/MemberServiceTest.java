@@ -18,7 +18,6 @@ import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.config.BeanIds;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -41,8 +40,6 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 @AutoConfigureMockMvc
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 public class MemberServiceTest {
-    @Autowired
-    BCryptPasswordEncoder bCryptPasswordEncoder;
     @Autowired
     EntityManager em;
 
@@ -172,12 +169,14 @@ public class MemberServiceTest {
     }
 
     private Member createMember() {
-        Member member = new Member(
-                "eoruadl",
-                bCryptPasswordEncoder.encode("1234"),
-                "nick",
-                "name",
-                "test@gmail.com");
+        Member member = Member.builder()
+                .memberId("eoruadl")
+                .password("1234")
+                .nickName("nick")
+                .name("name")
+                .email("test@gmail.com")
+                .build();
+        member.updateCreatedAt();
         em.persist(member);
         return member;
     }

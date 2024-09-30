@@ -218,22 +218,28 @@ public class CommentControllerTest {
     }
 
     private Member createMember() {
-        Member member = new Member(
-                "eoruadl",
-                bCryptPasswordEncoder.encode("1234"),
-                "nick",
-                "name",
-                "test@gmail.com");
+        Member member = Member.builder()
+                .memberId("eoruadl")
+                .password("1234")
+                .nickName("nick")
+                .name("name")
+                .email("test@gmail.com")
+                .build();
+        member.updateCreatedAt();
+
         em.persist(member);
         return member;
     }
 
     private void initComments(Long memberId) {
         Member member = memberRepository.findById(memberId).orElseThrow(NoSuchElementException::new);
-        String topic = "test";
-        String title = "title";
-        String content = "content";
-        Post post = Post.createPost(member, topic, title, content);
+        Post post = Post.builder()
+                .member(member)
+                .topic("test")
+                .title("title")
+                .content("content")
+                .build();
+
         postRepository.save(post);
 
         for (int i = 0; i < 3; i++) {
@@ -248,7 +254,7 @@ public class CommentControllerTest {
 
         Comment parentComment = commentRepository.findById(parentId).orElseThrow(NoSuchElementException::new);
 
-        content = "childContent";
+        String content = "childContent";
         Comment childComment = new Comment(content, member, post);
         childComment.updateParent(parentComment);
         childComment.updateCreatedAt();

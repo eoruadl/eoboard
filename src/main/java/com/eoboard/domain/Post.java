@@ -1,14 +1,17 @@
 package com.eoboard.domain;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Getter @Setter
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Post extends BaseTimeEntity {
 
     @Id @GeneratedValue
@@ -30,14 +33,24 @@ public class Post extends BaseTimeEntity {
     @OneToMany(mappedBy = "post")
     private List<PostLike> postLikes = new ArrayList<>();
 
-    public static Post createPost(Member member, String topic, String title, String content) {
-        Post post = new Post();
-        post.setMember(member);
-        post.setTopic(topic);
-        post.setTitle(title);
-        post.setContent(content);
-        post.updateCreatedAt();
-        return post;
+    @Builder
+    public Post(String topic, String title, String content, Member member) {
+        this.topic = topic;
+        this.title = title;
+        this.content = content;
+        this.member = member;
+    }
+
+    public void updateTopic(String topic) {
+        this.topic = topic;
+    }
+
+    public void updateTitle(String title) {
+        this.title = title;
+    }
+
+    public void updateContent(String content) {
+        this.content = content;
     }
 
     public void upLike() {

@@ -42,7 +42,6 @@ public class PostApiController {
     @GetMapping("/api/v1/post/{postId}")
     public PostDto getPost(@PathVariable("postId") Long postId) {
         PostDto post = postRepository.findPost(postId);
-        System.out.println(post);
         if (post == null) {
             throw new IllegalArgumentException("게시물이 존재하지 않습니다.");
         }

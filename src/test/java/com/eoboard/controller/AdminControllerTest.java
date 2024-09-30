@@ -238,12 +238,14 @@ public class AdminControllerTest {
 
 
     private Member createMember() {
-        Member member = new Member(
-                "eoruadl",
-                bCryptPasswordEncoder.encode("1234"),
-                "nick",
-                "name",
-                "test@gmail.com");
+        Member member = Member.builder()
+                .memberId("eoruadl")
+                .password("1234")
+                .nickName("nick")
+                .name("name")
+                .email("test@gmail.com")
+                .build();
+        member.updateCreatedAt();
         member.updateRole(Role.ADMIN);
         em.persist(member);
         return member;
@@ -254,7 +256,14 @@ public class AdminControllerTest {
         String topic = "test";
         String title = "title";
         String content = "content";
-        Post post = Post.createPost(member, topic, title, content);
+//        Post post = Post.createPost(member, topic, title, content);
+        Post post = Post.builder()
+                .member(member)
+                .topic("test")
+                .title("title")
+                .content("content")
+                .build();
+        post.updateCreatedAt();
         postRepository.save(post);
 
         for (int i = 0; i < 3; i++) {

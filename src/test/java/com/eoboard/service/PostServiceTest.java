@@ -7,7 +7,6 @@ import com.eoboard.dto.post.PostPageDto;
 import com.eoboard.repository.PostRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -15,7 +14,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,8 +31,6 @@ public class PostServiceTest {
 
     @Autowired
     MockMvc mockMvc;
-    @Autowired
-    BCryptPasswordEncoder bCryptPasswordEncoder;
     @Autowired
     PostService postService;
     @Autowired
@@ -180,12 +176,14 @@ public class PostServiceTest {
     }
 
     private Member createMember() {
-        Member member = new Member(
-                "eoruadl",
-                bCryptPasswordEncoder.encode("1234"),
-                "nick",
-                "name",
-                "test@gmail.com");
+        Member member = Member.builder()
+                .memberId("eoruadl")
+                .password("1234")
+                .nickName("nick")
+                .name("name")
+                .email("test@gmail.com")
+                .build();
+        member.updateCreatedAt();
         em.persist(member);
         return member;
     }

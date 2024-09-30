@@ -41,12 +41,14 @@ public class LikeServiceTest {
     @Test
     public void 게시물_좋아요() throws Exception {
         //given
-        Member member = new Member(
-                "eoruadl",
-                "1234",
-                "nick",
-                "name",
-                "test@gmail.com");
+        Member member = Member.builder()
+                .memberId("eoruadl")
+                .password("1234")
+                .nickName("nick")
+                .name("name")
+                .email("test@gmail.com")
+                .build();
+        member.updateCreatedAt();
         em.persist(member);
 
         Long postId = postService.post(member.getId(), "test1", "게시물1", "게시물 작성합니다.");
@@ -64,12 +66,14 @@ public class LikeServiceTest {
     @Test
     public void 게시물_좋아요_취소() throws Exception {
         //given
-        Member member = new Member(
-                "eoruadl",
-                "1234",
-                "nick",
-                "name",
-                "test@gmail.com");
+        Member member = Member.builder()
+                .memberId("eoruadl")
+                .password("1234")
+                .nickName("nick")
+                .name("name")
+                .email("test@gmail.com")
+                .build();
+        member.updateCreatedAt();
         em.persist(member);
 
         Long postId = postService.post(member.getId(), "test1", "게시물1", "게시물 작성합니다.");
@@ -88,12 +92,14 @@ public class LikeServiceTest {
     @Test
     public void 댓글_좋아요() throws Exception {
         //given
-        Member member = new Member(
-                "eoruadl",
-                "1234",
-                "nick",
-                "name",
-                "test@gmail.com");
+        Member member = Member.builder()
+                .memberId("eoruadl")
+                .password("1234")
+                .nickName("nick")
+                .name("name")
+                .email("test@gmail.com")
+                .build();
+        member.updateCreatedAt();
         em.persist(member);
 
         Long postId = postService.post(member.getId(), "test1", "게시물1", "게시물 작성합니다.");
@@ -113,12 +119,14 @@ public class LikeServiceTest {
     @Test
     public void 댓글_좋아요_취소() throws Exception {
         //given
-        Member member = new Member(
-                "eoruadl",
-                "1234",
-                "nick",
-                "name",
-                "test@gmail.com");
+        Member member = Member.builder()
+                .memberId("eoruadl")
+                .password("1234")
+                .nickName("nick")
+                .name("name")
+                .email("test@gmail.com")
+                .build();
+        member.updateCreatedAt();
         em.persist(member);
 
         Long postId = postService.post(member.getId(), "test1", "게시물1", "게시물 작성합니다.");

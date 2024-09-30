@@ -30,7 +30,11 @@ public class CommentService {
         Member findMember = memberRepository.findByMemberId(memberId).orElseThrow(NoSuchElementException::new);
         Post findPost = postRepository.findById(postId).orElseThrow(NoSuchElementException::new);
 
-        Comment comment = new Comment(content, findMember, findPost);
+        Comment comment = Comment.builder()
+                .content(content)
+                .member(findMember)
+                .post(findPost)
+                .build();
         Comment parentComment;
         if (parentId != null) {
             parentComment = commentRepository.findById(parentId).orElseThrow(NoSuchElementException::new);

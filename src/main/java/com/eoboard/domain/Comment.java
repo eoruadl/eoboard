@@ -2,17 +2,17 @@ package com.eoboard.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Getter @Setter
 public class Comment extends BaseTimeEntity {
 
     @Id
@@ -45,6 +45,7 @@ public class Comment extends BaseTimeEntity {
     @OneToMany(mappedBy = "comment")
     private List<CommentLike> commentLikes = new ArrayList<>();
 
+    @Builder
     public Comment(String content, Member member, Post post) {
         this.content = content;
         this.member = member;
@@ -74,3 +75,4 @@ public class Comment extends BaseTimeEntity {
     }
 
 }
+

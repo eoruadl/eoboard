@@ -26,7 +26,14 @@ public class PostService {
     public Long post(Long memberId, String topic, String title, String content) {
         Member member = memberRepository.findById(memberId).orElseThrow(NoSuchElementException::new);
 
-        Post post = Post.createPost(member, topic, title, content);
+        Post post = Post.builder()
+                .member(member)
+                .topic(topic)
+                .title(title)
+                .content(content)
+                .build();
+
+        post.updateCreatedAt();
 
         postRepository.save(post);
 
@@ -39,10 +46,11 @@ public class PostService {
     @Transactional
     public void updatePost(Long postId, String topic, String title, String content) {
         Post findPost = postRepository.findById(postId).orElseThrow(NoSuchElementException::new);
-        findPost.setTopic(topic);
-        findPost.setTitle(title);
-        findPost.setContent(content);
-        findPost.updateCreatedAt();
+
+        findPost.updateTopic(topic);
+        findPost.updateTitle(title);
+        findPost.updateContent(content);
+        findPost.updateUpdatedAt();
     }
 
     /**
